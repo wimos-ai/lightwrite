@@ -4,29 +4,82 @@ project(MyProject)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find SDL2 and SDL2_ttf
+include(CTest)  # Enables testing
+
+# -------------------------
+# Dependencies
+# -------------------------
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 
-# Collect all source files in ./src
+# Fetch GoogleTest automatically
+include(FetchContent)
+
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+
+# For Windows: prevent overriding parent project's compiler settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(googletest)
+include(GoogleTest)
+
+# -------------------------
+# Source files
+# -------------------------
+
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/*.c
     ${CMAKE_SOURCE_DIR}/src/*.cpp
 )
 
-# Create executable
-include_directories(${CMAKE_SOURCE_DIR}/include)
-add_executable(${PROJECT_NAME} ${SOURCES})
-add_compile_definitions(-DDATA_DIR="/home/willm/Desktop/lightwrite/data")
+list(REMOVE_ITEM SOURCES ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
-# Include directories
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2_TTF_INCLUDE_DIRS}
+file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS
+    ${CMAKE_SOURCE_DIR}/tests/*.cpp
 )
 
-# Link libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE
+# -------------------------
+# Core library (IMPORTANT)
+# -------------------------
+
+add_library(MyProjectLib ${SOURCES})
+
+target_include_directories(MyProjectLib PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(MyProjectLib PUBLIC
     SDL2::SDL2
     SDL2_ttf::SDL2_ttf
 )
+
+target_compile_definitions(MyProjectLib PUBLIC
+    DATA_DIR="/home/willm/Desktop/lightwrite/data"
+)
+
+# -------------------------
+# Main executable
+# -------------------------
+
+add_executable(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/main.cpp)  # adjust if needed
+target_link_libraries(${PROJECT_NAME} PRIVATE MyProjectLib)
+
+# -------------------------
+# Tests
+# -------------------------
+
+if(BUILD_TESTING AND TEST_FILES)
+    add_executable(${PROJECT_NAME}_tests ${TEST_FILES})
+
+    target_link_libraries(${PROJECT_NAME}_tests PRIVATE
+        MyProjectLib
+        GTest::gtest_main
+    )
+
+    include(GoogleTest)
+    gtest_discover_tests(${PROJECT_NAME}_tests)
+endif()
