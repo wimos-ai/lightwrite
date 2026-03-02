@@ -15,6 +15,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 
 # Create executable
+include_directories(${CMAKE_SOURCE_DIR}/include)
 add_executable(${PROJECT_NAME} ${SOURCES})
 add_compile_definitions(-DDATA_DIR="/home/willm/Desktop/lightwrite/data")
 
