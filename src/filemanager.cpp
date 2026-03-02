@@ -28,7 +28,7 @@ static void fileman_collect_files(File_Manager *man)
         if (man->size >= man->capacity)
         {
             man->capacity *= 2;
-            man->files = realloc(man->files, man->capacity * sizeof(File));
+            man->files = (File*)realloc(man->files, man->capacity * sizeof(File));
         }
 
         strcpy(man->files[man->size].name, man->direntry->d_name);
@@ -44,7 +44,7 @@ void fileman_init(File_Manager *man)
     LASSERT(man);
     man->capacity = FILEMAN_DEFAULT_CAPACITY;
     man->size = 0;
-    man->files = calloc(man->capacity, sizeof(File));
+    man->files = (File*)calloc(man->capacity, sizeof(File));
     LASSERT(man->files);
 
     man->dir = opendir(".");
@@ -104,7 +104,7 @@ bool fileman_create(File_Manager *man, const char *filename)
     if (man->size >= man->capacity)
     {
         man->capacity *= 2;
-        man->files = realloc(man->files, man->capacity * sizeof(File));
+        man->files = (File*)realloc(man->files, man->capacity * sizeof(File));
     }
 
     strcpy(man->files[man->size].name, filename);
