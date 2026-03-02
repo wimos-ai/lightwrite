@@ -2,9 +2,9 @@
 #define _FILEMANAGER_H_
 
 #ifdef __cplusplus
-extern "C"{
+extern "C"
+{
 #endif
-
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -12,28 +12,29 @@ extern "C"{
 
 #define FILEMAN_DEFAULT_CAPACITY 16
 
-typedef struct _File_ {
-    FILE* ptr;
-    char name[256];
-} File;
+    typedef struct _File_
+    {
+        FILE *ptr;
+        char name[256];
+    } File;
 
-typedef struct _File_Manager_ {
-    File* files;
-    struct dirent* direntry;
-    DIR* dir;
-        
-    size_t size;
-    size_t capacity;
-} File_Manager;
+    typedef struct _File_Manager_
+    {
+        File *files;
+        struct dirent *direntry;
+        DIR *dir;
 
-void fileman_init(File_Manager* man);
-void fileman_destroy(File_Manager* man);
+        size_t size;
+        size_t capacity;
+    } File_Manager;
 
-bool fileman_create(File_Manager* man, const char* filename);
+    void fileman_init(File_Manager *man);
+    void fileman_destroy(File_Manager *man);
+
+    bool fileman_create(File_Manager *man, const char *filename);
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif // !_FILEMANAGER_H_
