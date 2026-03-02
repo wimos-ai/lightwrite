@@ -1,6 +1,11 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+
 #include <stdbool.h>
 
 typedef enum _Log_Level_ {
@@ -41,5 +46,10 @@ void logger_print(Log_Level level, const char* message, ...);
 #ifndef LOG_INFO
 #define LOG_INFO(...) logger_print(LOG_LEVEL_INFO, __VA_ARGS__)
 #endif // !LOG_INFO
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // !_LOGGER_H_

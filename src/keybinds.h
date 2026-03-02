@@ -1,6 +1,11 @@
 #ifndef _KEYBINDS_H_
 #define _KEYBINDS_H_
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+
 #include <stdbool.h>
 
 typedef struct _Keybind_ {
@@ -15,5 +20,10 @@ void keybinds_on_up(int keycode);
 void keybinds_on_down(int keycode);
 
 bool keybinds_is_down(int keycode);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // !_KEYBINDS_H_

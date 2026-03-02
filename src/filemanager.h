@@ -1,6 +1,11 @@
 #ifndef _FILEMANAGER_H_
 #define _FILEMANAGER_H_
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -25,5 +30,10 @@ void fileman_init(File_Manager* man);
 void fileman_destroy(File_Manager* man);
 
 bool fileman_create(File_Manager* man, const char* filename);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // !_FILEMANAGER_H_

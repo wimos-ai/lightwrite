@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 
     // Check the len, just to be sure.
     if (argc == 2 && strlen(argv[1]) > 0) {
-        filename = calloc(1024, sizeof(char));
+        filename = (char*)calloc(1024, sizeof(char));
         strcpy(filename, argv[1]);
         
         // First read in the data
@@ -363,6 +363,7 @@ static bool handle_events(void) {
                         file_saved = true;
                     } else {
                         filename = "Choose a filename!";
+                        // strncpy(filename,"Choose a filename!", strlen("Choose a filename!") );
                         choosing_filename = true;
                     }
                 }
@@ -377,6 +378,7 @@ static bool handle_events(void) {
                 // File creation keybind: Ctrl + a (in Filemanager)
                 if (keybinds_is_down(SDLK_LCTRL) && file_man_opened && !filename) {
                     filename = "Choose a filename!";
+                    // strncpy(filename,"Choose a filename!", strlen("Choose a filename!") );
                     choosing_filename = true;
                 }
             } break;
@@ -388,7 +390,7 @@ static bool handle_events(void) {
         case SDL_TEXTINPUT: {
             if (choosing_filename) {
                 if (!strcmp(filename, "Choose a filename!")) {
-                    filename = calloc(1024, sizeof(char));
+                    filename = (char*)calloc(1024, sizeof(char));
                 }
                 strncat(filename, ev.text.text, 1024);
             } else if (!file_man_opened) {

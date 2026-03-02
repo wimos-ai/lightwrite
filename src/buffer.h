@@ -1,6 +1,11 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+
 /*
     TODO: This will soon need a rework since right now it is pretty slow and unusable for larger files.
 */
@@ -8,7 +13,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-
 #define MAX_LINE_SIZE 4096
 #define MAX_BUFFER_SIZE 4096
 
@@ -47,5 +51,9 @@ size_t buffer_get_cursor_row(Buffer_Context *context);
 // File support
 void buffer_read(Buffer_Context* context, FILE* file);
 bool buffer_write(Buffer_Context* context, FILE* file, const char* filename);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // !BUFFER_H

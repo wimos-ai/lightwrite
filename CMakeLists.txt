@@ -11,6 +11,7 @@ find_package(SDL2_ttf REQUIRED)
 # Collect all source files in ./src
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/*.c
+    ${CMAKE_SOURCE_DIR}/src/*.cpp
 )
 
 # Create executable
