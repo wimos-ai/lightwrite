@@ -50,7 +50,7 @@ void buffer_init(Buffer_Context *context)
 	context->cursor = 0;
 	context->size = 1;
 	context->capacity = BUFFER_DEFAULT_CAPACITY;
-	context->lines = calloc(context->capacity, sizeof(Line));
+	context->lines = (Line*)calloc(context->capacity, sizeof(Line));
 }
 
 void buffer_free(Buffer_Context *context)
@@ -71,7 +71,7 @@ void buffer_push_line(Buffer_Context *context)
 	if (context->size >= context->capacity)
 	{
 		context->capacity = context->capacity == 0 ? BUFFER_DEFAULT_CAPACITY : context->capacity * 2;
-		context->lines = realloc(context->lines, context->capacity * sizeof(Line));
+		context->lines = (Line*)realloc(context->lines, context->capacity * sizeof(Line));
 	}
 
 	// Zero-out the new fresh buffer

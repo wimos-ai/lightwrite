@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-    void lassert_fail(char *expr, char *file, int line);
+    void lassert_fail(const char *expr, const char *file, int line);
 
 #ifndef LASSERT
 #define LASSERT(expr) \
