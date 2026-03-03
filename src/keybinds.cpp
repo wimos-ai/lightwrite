@@ -8,8 +8,6 @@ static Keybind keybinds[] = {
     {SDLK_LSHIFT, false}};
 static const unsigned int keybinds_len = sizeof(keybinds) / sizeof(keybinds[0]);
 
-bool keybinds_init(void) { return true; }
-void keybinds_destroy(void) {}
 
 void keybinds_on_up(int keycode)
 {

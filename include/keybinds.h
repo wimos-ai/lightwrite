@@ -9,8 +9,6 @@ typedef struct _Keybind_
     bool pressed;
 } Keybind;
 
-bool keybinds_init(void);
-void keybinds_destroy(void);
 
 void keybinds_on_up(int keycode);
 void keybinds_on_down(int keycode);

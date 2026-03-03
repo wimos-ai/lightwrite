@@ -12,12 +12,6 @@ static const char level_str[LOG_LEVEL_MAX_TAG][32] = {
     "\033[1;32m[DEBUG]: ",
     "\033[1;37m[INFO]: "};
 
-bool logger_init(void)
-{
-    return true;
-}
-
-void logger_destroy(void) {}
 
 void logger_print(Log_Level level, const char *message, ...)
 {

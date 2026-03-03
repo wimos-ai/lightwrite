@@ -14,9 +14,6 @@ typedef enum _Log_Level_
     LOG_LEVEL_MAX_TAG
 } Log_Level;
 
-bool logger_init(void);
-void logger_destroy(void);
-
 void logger_print(Log_Level level, const char *message, ...);
 
 #ifndef LOG_FATAL

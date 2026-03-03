@@ -265,17 +265,12 @@ static bool init_all(void)
         return false;
     }
 
-    if (!logger_init())
-        return false;
-    if (!keybinds_init())
-        return false;
+
     return true;
 }
 
 static void destroy_all(void)
 {
-    keybinds_destroy();
-    logger_destroy();
     TTF_CloseFont(font);
     TTF_Quit();
     SDL_DestroyRenderer(renderer);
