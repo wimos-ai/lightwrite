@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "buffer.hpp"
 
 void line_ins_cursor(Line *line, const char *text)
 {
