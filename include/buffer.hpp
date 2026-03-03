@@ -9,6 +9,9 @@ public:
     Buffer();
     Buffer(const Buffer &) = default;
     Buffer(Buffer &&) = default;
+    Buffer &operator=(const Buffer &other) = default;
+    Buffer &operator=(Buffer &&other) = default;
+
 
 public:
     class Line

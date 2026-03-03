@@ -2,7 +2,7 @@
 #error "lightwrite can not yet be compiled for any version of windows."
 #endif /* if windows */
 
-#include "buffer.h"
+#include "buffer.hpp"
 #include "font.h"
 #include "keybinds.h"
 #include "logger.h"
@@ -28,7 +28,7 @@ static const SDL_Color text_color = {255, 255, 255, 255};
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static TTF_Font *font;
-static Buffer_Context context;
+static Buffer context;
 
 static char *filename;
 static bool choosing_filename;
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
             strcpy(file_man.files[0].name, filename);
             file_man.size++;
 
-            buffer_read(&context, fp);
+            context = Buffer::read(fp);
         }
     }
 
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
     Font_Data data;
     SDL_Rect rect;
 
-    char substr[MAX_LINE_SIZE];
+    char substr[4096];
 
     char name[1024] = "<untitled>";
     int status_height = 18;
@@ -164,19 +164,19 @@ int main(int argc, char **argv)
             SDL_RenderSetScale(renderer, 1.f, 1.f);
         }
 
-        for (size_t i = 0; i < context.size; ++i)
+        for (size_t i = 0; i < context.lines.size(); ++i)
         {
-            TTF_SizeText(font, context.lines[i].buffer, &width, &height);
+            TTF_SizeText(font, context.lines[i].buffer.c_str(), &width, &height);
 
             data = prepare_string(font, renderer, 0,
-                                  status_height + (i * data.font_h), context.lines[i].buffer, text_color);
+                                  status_height + (i * data.font_h), context.lines[i].buffer.c_str(), text_color);
             SDL_RenderCopy(renderer, data.texture, NULL, &data.rect);
             SDL_DestroyTexture(data.texture);
         }
 
         // Getting the string written from the left of the screen until the cursor.
         memset(substr, 0, sizeof(substr));
-        strncpy(substr, context.lines[context.cursor].buffer, context.lines[context.cursor].cursor);
+        strncpy(substr, context.lines[context.cursor].buffer.c_str(), context.lines[context.cursor].cursor);
 
         if (width >= screen_width)
         {
@@ -264,7 +264,6 @@ static bool init_all(void)
         return false;
     }
 
-    buffer_init(&context);
     if (!logger_init())
         return false;
     if (!keybinds_init())
@@ -278,7 +277,6 @@ static void destroy_all(void)
     fileman_destroy(&file_man);
     keybinds_destroy();
     logger_destroy();
-    buffer_free(&context);
     TTF_CloseFont(font);
     TTF_Quit();
     SDL_DestroyRenderer(renderer);
@@ -321,13 +319,13 @@ static bool handle_events(void)
                 }
                 else
                 {
-                    buffer_del_cursor(&context);
+                    context.del_cursor();
                 }
             }
             break;
             case SDLK_LEFT:
             {
-                if (buffer_get_cursor_row(&context) > 0)
+                if (context.get_cursor_row() > 0)
                 {
                     context.lines[context.cursor].cursor--;
                 }
@@ -335,8 +333,8 @@ static bool handle_events(void)
             break;
             case SDLK_RIGHT:
             {
-                if (buffer_get_cursor_row(&context) <
-                    context.lines[context.cursor].size)
+                if (context.get_cursor_row() <
+                    context.lines[context.cursor].buffer.size())
                 {
                     context.lines[context.cursor].cursor++;
                 }
@@ -357,7 +355,7 @@ static bool handle_events(void)
                 {
                     context.cursor--;
                     context.lines[context.cursor].cursor =
-                        context.lines[context.cursor].size;
+                        context.lines[context.cursor].buffer.size();
                 }
             }
             break;
@@ -372,17 +370,17 @@ static bool handle_events(void)
                     continue;
                 }
 
-                if (context.cursor < (context.size - 1))
+                if (context.cursor < (context.lines.size() - 1))
                 {
                     context.cursor++;
                     context.lines[context.cursor].cursor =
-                        context.lines[context.cursor].size;
+                        context.lines[context.cursor].buffer.size();
                 }
             }
             break;
             case SDLK_DELETE:
             {
-                buffer_del(&context);
+                context.del();
             }
             break;
             case SDLK_RETURN:
@@ -402,7 +400,7 @@ static bool handle_events(void)
                     {
                         if (file_man.files[file_man_cursor].ptr)
                         {
-                            buffer_read(&context, file_man.files[file_man_cursor].ptr);
+                            context = Buffer::read(file_man.files[file_man_cursor].ptr);
                             filename = file_man.files[file_man_cursor].name;
                             file_man_opened = false;
                         }
@@ -412,14 +410,14 @@ static bool handle_events(void)
 
                 if (choosing_filename)
                 {
-                    buffer_write(&context, file_man.files[0].ptr, filename);
+                    context.write(file_man.files[0].ptr, filename);
                     LOG_INFO("%s saved!", filename);
                     choosing_filename = false;
                     file_saved = true;
                 }
                 else
                 {
-                    buffer_push_line(&context);
+                    context.push_line();
                 }
             }
             break;
@@ -430,7 +428,7 @@ static bool handle_events(void)
                 {
                     if (filename)
                     {
-                        buffer_write(&context, file_man.files[0].ptr, filename);
+                        context.write(file_man.files[0].ptr, filename);
                         LOG_INFO("%s saved!", filename);
                         file_saved = true;
                     }
@@ -483,7 +481,7 @@ static bool handle_events(void)
             }
             else if (!file_man_opened)
             {
-                buffer_ins_cursor(&context, ev.text.text);
+                context.ins_cursor(ev.text.text);
                 file_saved = false;
             }
         }
