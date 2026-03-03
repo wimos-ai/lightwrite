@@ -1,115 +1,49 @@
-#include "filemanager.h"
-#include "lassert.h"
+#include "filemanager.hpp"
 #include "logger.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
+#include <filesystem>
+#include <cstring>
 
-// Collect all files in current dir
-static void fileman_collect_files(File_Manager *man)
+namespace fs = std::filesystem;
+
+FileManager::FileManager(const char *dir)
 {
-    LASSERT(man);
-    LASSERT(man->files);
+    fs::path root{dir};
 
-    while ((man->direntry = readdir(man->dir)) != NULL)
+    for (const auto &entry : fs::directory_iterator(root))
     {
-        struct stat stbuf;
-        if (stat(man->direntry->d_name, &stbuf) == -1)
+        if (entry.is_regular_file())
         {
-            LOG_ERROR("Failed to stat %s", man->direntry->d_name);
-            continue;
-        }
-
-        // TODO: Handle subdirectories
-        if ((stbuf.st_mode & S_IFMT) == S_IFDIR)
-            continue;
-
-        if (man->size >= man->capacity)
-        {
-            man->capacity *= 2;
-            man->files = (File*)realloc(man->files, man->capacity * sizeof(File));
-        }
-
-        strcpy(man->files[man->size].name, man->direntry->d_name);
-
-        // Create a ptr for reading
-        man->files[man->size].ptr = fopen(man->files[man->size].name, "r");
-        man->size++;
-    }
-}
-
-void fileman_init(File_Manager *man)
-{
-    LASSERT(man);
-    man->capacity = FILEMAN_DEFAULT_CAPACITY;
-    man->size = 0;
-    man->files = (File*)calloc(man->capacity, sizeof(File));
-    LASSERT(man->files);
-
-    man->dir = opendir(".");
-    LASSERT(man->dir);
-    fileman_collect_files(man);
-}
-
-void fileman_destroy(File_Manager *man)
-{
-    if (man)
-    {
-        if (man->files)
-        {
-            for (size_t i = 0; i <= man->size; ++i)
-            {
-                if (man->files[i].ptr)
-                {
-                    fclose(man->files[i].ptr);
-                }
-            }
-            free(man->files);
+            fs::path relative = fs::relative(entry.path(), root);
+            files.emplace_back();
+            files.back().name = relative;
+            files.back().ptr = fopen(relative.c_str(), "r");
         }
     }
 }
 
-bool fileman_create(File_Manager *man, const char *filename)
+bool FileManager::create_f(const char *name)
 {
-    LASSERT(man);
-
-    // Do not use LASSERT macro here since the editor should not quit if the filename is empty, instead handle it by drawing some kind of error
-    if (!filename)
+    if (!name || strlen(name) == 0)
     {
-        LOG_ERROR("Invalid filename.");
         return false;
     }
 
-    // TODO: Here should probably be some kind of directory checking.
-
-    for (size_t i = 0; i <= man->size; ++i)
+    for (const auto &f : this->files)
     {
-        if (!strcmp(man->files[i].name, filename))
+        if (f.name == name)
         {
-            LOG_ERROR("File %s already exists!", filename);
             return false;
         }
     }
 
-    // this will create the file
-    FILE *fp = fopen(filename, "w+");
+    FILE *fp = fopen(name, "w+");
     if (!fp)
     {
-        LOG_ERROR("Failed to create: %s", filename);
+        LOG_ERROR("Failed to create: %s", name);
         return false;
     }
 
-    // Add the file to the cached files
-    if (man->size >= man->capacity)
-    {
-        man->capacity *= 2;
-        man->files = (File*)realloc(man->files, man->capacity * sizeof(File));
-    }
-
-    strcpy(man->files[man->size].name, filename);
-    man->files[man->size].ptr = fp;
-
-    man->size++;
+    this->files.emplace_back(name, fp);
     return true;
 }

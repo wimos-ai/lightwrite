@@ -6,7 +6,7 @@
 #include "font.h"
 #include "keybinds.h"
 #include "logger.h"
-#include "filemanager.h"
+#include "filemanager.hpp"
 
 #include "buffer.hpp"
 
@@ -34,7 +34,7 @@ static char *filename;
 static bool choosing_filename;
 static bool file_saved;
 
-static File_Manager file_man;
+static FileManager file_man(".");
 static bool file_man_opened;
 static size_t file_man_cursor;
 
@@ -58,20 +58,21 @@ int main(int argc, char **argv)
     // Check the len, just to be sure.
     if (argc == 2 && strlen(argv[1]) > 0)
     {
-        filename = (char *)calloc(1024, sizeof(char));
-        strcpy(filename, argv[1]);
+        // filename = (char *)calloc(1024, sizeof(char));
+        // strcpy(filename, argv[1]);
 
-        // First read in the data
-        FILE *fp = fopen(argv[1], "r");
-        // buffer_write will automatically create the file anyways.
-        if (fp)
-        {
-            file_man.files[0].ptr = fp;
-            strcpy(file_man.files[0].name, filename);
-            file_man.size++;
+        // // First read in the data
+        // FILE *fp = fopen(argv[1], "r");
+        // // buffer_write will automatically create the file anyways.
+        // if (fp)
+        // {
+        //     file_man.files[0].ptr = fp;
+        //     strcpy(file_man.files[0].name, filename);
+        //     file_man.size++;
 
-            context = Buffer::read(fp);
-        }
+        //     context = Buffer::read(fp);
+        // }
+        // TODO: Start File Manager at path, with given file open
     }
 
     // Moving some variable decls up here for performance reasons.
@@ -103,14 +104,14 @@ int main(int argc, char **argv)
             SDL_SetRenderDrawColor(renderer, 15, 15, 15, 255);
             SDL_RenderFillRect(renderer, &rect);
 
-            for (size_t i = 0; i <= file_man.size; ++i)
+            for (size_t i = 0; i <= file_man.files.size(); ++i)
             {
-                File f = file_man.files[i];
+                FileManager::File f = file_man.files[i];
                 if (!f.ptr)
                     continue;
 
                 data = prepare_string(font, renderer, 0,
-                                      i * data.font_h, f.name, text_color);
+                                      i * data.font_h, f.name.c_str(), text_color);
                 SDL_RenderCopy(renderer, data.texture, NULL, &data.rect);
                 SDL_DestroyTexture(data.texture);
             }
@@ -268,13 +269,11 @@ static bool init_all(void)
         return false;
     if (!keybinds_init())
         return false;
-    fileman_init(&file_man);
     return true;
 }
 
 static void destroy_all(void)
 {
-    fileman_destroy(&file_man);
     keybinds_destroy();
     logger_destroy();
     TTF_CloseFont(font);
@@ -363,7 +362,7 @@ static bool handle_events(void)
             {
                 if (file_man_opened)
                 {
-                    if (file_man_cursor < file_man.size - 1)
+                    if (file_man_cursor < file_man.files.size() - 1)
                     {
                         file_man_cursor++;
                     }
@@ -389,7 +388,7 @@ static bool handle_events(void)
                 {
                     if (choosing_filename)
                     {
-                        if (!fileman_create(&file_man, filename))
+                        if (!file_man.create_f(filename))
                         {
                             // TODO: Print some error message to the screen.
                         }
@@ -401,7 +400,7 @@ static bool handle_events(void)
                         if (file_man.files[file_man_cursor].ptr)
                         {
                             context = Buffer::read(file_man.files[file_man_cursor].ptr);
-                            filename = file_man.files[file_man_cursor].name;
+                            filename = (char*)file_man.files[file_man_cursor].name.c_str();
                             file_man_opened = false;
                         }
                     }
