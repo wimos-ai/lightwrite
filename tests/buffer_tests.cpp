@@ -114,8 +114,6 @@ std::ostream &operator<<(std::ostream &os, const Buffer &b)
     return os;
 }
 
-
-
 TEST(ConvTest_Buffer, Buffer_push_ln)
 {
     Buffer ctxt2;
@@ -123,7 +121,6 @@ TEST(ConvTest_Buffer, Buffer_push_ln)
 
     EXPECT_EQ(ctxt2.lines.size(), 2);
 }
-
 
 TEST(ConvTest_Buffer, Buffer_to_from_file)
 {

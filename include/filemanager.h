@@ -16,10 +16,11 @@ typedef struct _File_
 typedef struct _File_Manager_
 {
     File *files;
+    size_t size;
+
     struct dirent *direntry;
     DIR *dir;
 
-    size_t size;
     size_t capacity;
 } File_Manager;
 
