@@ -7,8 +7,8 @@
 #include "keybinds.h"
 #include "logger.h"
 #include "filemanager.hpp"
-
-#include "buffer.hpp"
+#include "app.hpp"
+#include "edit_layer.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -41,7 +41,7 @@ static size_t file_man_cursor;
 static bool init_all(void);
 static void destroy_all(void);
 static bool handle_events(void);
-
+/*
 int main(int argc, char **argv)
 {
     if (argc > 2)
@@ -494,4 +494,20 @@ static bool handle_events(void)
         break;
     }
     return false;
+}
+*/
+
+int main()
+{
+    if (!AppContainer::subsystem_init())
+    {
+        return EXIT_FAILURE;
+    }
+
+    {
+        AppContainer ctnr(std::make_unique<EditLayer>(FONT_PATH, 16), "lightbrite", 800, 600);
+        ctnr.run();
+    }
+
+    AppContainer::subsystem_destroy();
 }
