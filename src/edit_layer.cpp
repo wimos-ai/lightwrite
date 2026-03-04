@@ -15,12 +15,8 @@ EditLayer::EditLayer(const char *font_path, int font_sz) : font(TTF_OpenFont(fon
 EditLayer::EditLayer(const char *font_path, int font_sz, const char *fname) : EditLayer(font_path, font_sz)
 {
     filename = fname;
-    FILE *f = fopen(fname, "r");
-    if (f)
-    {
-        this->context = Buffer::read(f);
-        fclose(f);
-    }
+
+    this->context = Buffer::read(fname);
 
     file_saved = true;
 }
@@ -187,14 +183,10 @@ void EditLayer::save_buffer()
     if (filename.has_value())
     {
         const char *fname = filename.value().c_str();
-        auto fptr = fopen(fname, "w+");
-        if (fptr)
-        {
-            context.write(fptr, fname);
-            fclose(fptr);
-            LOG_INFO("%s saved!", fname);
-            file_saved = true;
-        }
+
+        context.write(fname);
+        LOG_INFO("%s saved!", fname);
+        file_saved = true;
     }
     else
     {

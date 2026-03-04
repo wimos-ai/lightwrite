@@ -129,12 +129,9 @@ TEST(ConvTest_Buffer, Buffer_to_from_file)
     b1.ins_cursor(msg);
 
     auto fname = "./file_test.txt";
-    FILE *f = fopen(fname, "w+");
-    b1.write(f, fname);
-    fclose(f);
+    b1.write(fname);
 
-    f = fopen(fname, "r");
-    Buffer b2{Buffer::read(f)};
+    Buffer b2{Buffer::read(fname)};
     EXPECT_EQ(b1.lines.size(), b2.lines.size());
 
     for (size_t i = 0; i < b1.lines.size(); i++)

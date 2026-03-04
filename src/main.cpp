@@ -1,7 +1,3 @@
-#if defined(_WIN32) || defined(WIN32)
-#error "lightwrite can not yet be compiled for any version of windows."
-#endif /* if windows */
-
 #include "buffer.hpp"
 #include "font.h"
 #include "keybinds.h"
@@ -506,8 +502,7 @@ int main(int argc, const char *const *argv)
     }
 
     {
-        // TODO: Running this with llama.txt as argv[1] causes segfault in draw_cursor code
-        std::shared_ptr<EditLayer> ptr = argc == 2 ?std::make_shared<EditLayer>(FONT_PATH, 16, argv[1]) : std::make_shared<EditLayer>(FONT_PATH, 16) ;
+        std::shared_ptr<EditLayer> ptr = argc == 2 ? std::make_shared<EditLayer>(FONT_PATH, 16, argv[1]) : std::make_shared<EditLayer>(FONT_PATH, 16);
 
         AppContainer ctnr(ptr, "lightbrite", 800, 600);
         ctnr.run();

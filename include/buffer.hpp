@@ -44,8 +44,8 @@ public:
     auto operator<=>(const Buffer &) const = default;
 
 public:
-    static Buffer read(FILE *file);
-    bool write(FILE *file, const char *filename);
+    static Buffer read( const char *filename);
+    bool write(const char *filename);
 
 public:
     std::vector<Line> lines;

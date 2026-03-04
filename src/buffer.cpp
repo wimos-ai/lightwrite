@@ -60,18 +60,20 @@ size_t Buffer::get_cursor_row()
     return lines[cursor].cursor;
 }
 
-Buffer Buffer::read(FILE *file)
+Buffer Buffer::read(const char *filename)
 {
     char *line = NULL;
     size_t length = 0;
     std::vector<std::string> lines;
+
+    auto file = fopen(filename, "r+");
+
     while (getline(&line, &length, file) != -1)
     {
         if (line == nullptr)
         {
             break;
         }
-        
 
         lines.emplace_back(line);
         if (lines.back().size() > 0 && lines.back().back() == '\n')
@@ -96,16 +98,10 @@ Buffer Buffer::read(FILE *file)
     return b;
 }
 
-bool Buffer::write(FILE *file, const char *filename)
+bool Buffer::write(const char *filename)
 {
-    // closing unopened files will seg-fault
-    if (file)
-    {
-        fclose(file);
-    }
-
     // Open the file for writing (and create it if it doesn't already exist)
-    file = fopen(filename, "w+");
+    auto file = fopen(filename, "w+");
     // Check for errors anyways, since it may want to create a file in write-protected area or any other error may occour.
     if (!file)
     {
@@ -120,6 +116,8 @@ bool Buffer::write(FILE *file, const char *filename)
         fprintf(file, "%s\n", line);
     }
     fprintf(file, "%s", this->lines[i].buffer.c_str());
+
+    fclose(file);
 
     return true;
 }
