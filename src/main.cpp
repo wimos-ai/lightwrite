@@ -9,6 +9,7 @@
 #include "filemanager.hpp"
 #include "app.hpp"
 #include "edit_layer.hpp"
+#include "line_selector.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -497,6 +498,7 @@ static bool handle_events(void)
 }
 */
 
+#include <iostream>
 int main()
 {
     if (!AppContainer::subsystem_init())
@@ -505,8 +507,14 @@ int main()
     }
 
     {
-        AppContainer ctnr(std::make_unique<EditLayer>(FONT_PATH, 16, "Snail.txt"), "lightbrite", 800, 600);
+        auto ptr = std::make_shared<LineSelector>(FONT_PATH, 72, FONT_PATH, 16, "LineSelectorTest");
+        AppContainer ctnr(ptr, "lightbrite", 800, 600);
         ctnr.run();
+        if (ptr->has_value())
+        {
+            std::cout << ptr->value() << '\n';
+        }
+        
     }
 
     AppContainer::subsystem_destroy();

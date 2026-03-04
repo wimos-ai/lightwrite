@@ -26,7 +26,7 @@ public:
     // Return false to end this section of the program
     bool running() override;
 
-    std::unique_ptr<AppLayer> next() override;
+    std::shared_ptr<AppLayer> next() override;
 
 private:
     void render_filename(SDL_Renderer *renderer, int w, int h, bool file_saved);

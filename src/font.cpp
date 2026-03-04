@@ -1,12 +1,12 @@
 #include "font.h"
-#include <string.h>
+#include <cstring>
 
 // NOTE: Removed Font_Data caching since it caused a invisibility bug and was not that much of a performance boost.
 Font_Data prepare_string(TTF_Font *font, SDL_Renderer *renderer, int x, int y,
 						 const char *string, SDL_Color color)
 {
 	int stringlen = strlen(string);
-	char *draw_string = (char *)string;
+	char *draw_string = (char *)string; // TODO: UB!
 
 	// Do not draw newline chars
 	if (string[stringlen - 1] == '\n')

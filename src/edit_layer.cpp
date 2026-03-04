@@ -194,7 +194,7 @@ bool EditLayer::running()
     return true;
 }
 
-std::unique_ptr<AppLayer> EditLayer::next()
+std::shared_ptr<AppLayer> EditLayer::next()
 {
     return std::unique_ptr<AppLayer>();
 }

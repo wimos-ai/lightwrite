@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <memory>
+#include <optional>
 
 class AppLayer
 {
@@ -18,9 +19,14 @@ public:
     // Return false to end this section of the program
     virtual bool running() = 0;
 
-    virtual std::unique_ptr<AppLayer> next() = 0;
+    virtual std::shared_ptr<AppLayer> next() = 0;
 
     virtual ~AppLayer() = default;
+};
+
+template <typename T>
+class ResourceSelectionLayer : public AppLayer, public std::optional<T>
+{
 };
 
 class AppContainer
@@ -30,7 +36,7 @@ public:
     static void subsystem_destroy();
 
 public:
-    AppContainer(std::unique_ptr<AppLayer> start_layer, const char *name, int w, int h);
+    AppContainer(std::shared_ptr<AppLayer> start_layer, const char *name, int w, int h);
     ~AppContainer();
 
     void run();
@@ -47,7 +53,7 @@ private:
     void handle_uncaught_event(const SDL_Event &evt);
 
 private:
-    std::vector<std::unique_ptr<AppLayer>> layers;
+    std::vector<std::shared_ptr<AppLayer>> layers;
     SDL_Window *window{nullptr};
     SDL_Renderer *renderer{nullptr};
 

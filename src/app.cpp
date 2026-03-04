@@ -25,7 +25,7 @@ void AppContainer::subsystem_destroy()
     SDL_Quit();
 }
 
-AppContainer::AppContainer(std::unique_ptr<AppLayer> start_layer, const char *name, int w_, int h_) : w(w_),
+AppContainer::AppContainer(std::shared_ptr<AppLayer> start_layer, const char *name, int w_, int h_) : w(w_),
                                                                                                       h(h_)
 {
     layers.emplace_back(std::move(start_layer));
@@ -74,6 +74,8 @@ void AppContainer::update_layers()
 void AppContainer::render_layers()
 {
     // Render from bottom up
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderClear(renderer);
     for (auto &layer : layers)
     {
         layer->render(window, renderer, w, h);
