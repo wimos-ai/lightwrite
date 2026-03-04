@@ -1,5 +1,6 @@
 #include "buffer.hpp"
 #include <cstring>
+#include <fstream>
 
 void Buffer::Line::ins_cursor(const char *text)
 {
@@ -62,31 +63,12 @@ size_t Buffer::get_cursor_row()
 
 Buffer Buffer::read(const char *filename)
 {
-    char *line = NULL;
-    size_t length = 0;
     std::vector<std::string> lines;
-
-    auto file = fopen(filename, "r+");
-
-    while (getline(&line, &length, file) != -1)
+    std::string line;
+    std::ifstream fi(filename);
+    while (std::getline(fi, line))
     {
-        if (line == nullptr)
-        {
-            break;
-        }
-
-        lines.emplace_back(line);
-        if (lines.back().size() > 0 && lines.back().back() == '\n')
-        {
-            lines.back().pop_back();
-        }
-
-        free(line);
-        line = nullptr;
-    }
-    if (line != nullptr)
-    {
-        free(line);
+        lines.emplace_back(std::move(line));
     }
 
     Buffer b;
@@ -100,24 +82,12 @@ Buffer Buffer::read(const char *filename)
 
 bool Buffer::write(const char *filename)
 {
-    // Open the file for writing (and create it if it doesn't already exist)
-    auto file = fopen(filename, "w+");
-    // Check for errors anyways, since it may want to create a file in write-protected area or any other error may occour.
-    if (!file)
-    {
-        printf("Failed to open/create: %s\n", filename);
-        return false;
-    }
-    size_t i;
-    for (i = 0; i < this->lines.size() - 1; ++i)
-    {
-        const char *line = this->lines[i].buffer.c_str();
+    std::ofstream of(filename);
 
-        fprintf(file, "%s\n", line);
-    }
-    fprintf(file, "%s", this->lines[i].buffer.c_str());
-
-    fclose(file);
+    for (const auto& line : this->lines)
+    {
+        of << line.buffer << std::endl;
+    }    
 
     return true;
 }
