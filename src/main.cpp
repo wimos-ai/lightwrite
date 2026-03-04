@@ -497,8 +497,8 @@ static bool handle_events(void)
     return false;
 }
 */
-
-int main()
+#include <iostream>
+int main(int argc, const char *const *argv)
 {
     if (!AppContainer::subsystem_init())
     {
@@ -506,7 +506,10 @@ int main()
     }
 
     {
-        AppContainer ctnr(std::make_shared<EditLayer>(FONT_PATH, 16), "lightbrite", 800, 600);
+        // TODO: Running this with llama.txt as argv[1] causes segfault in draw_cursor code
+        std::shared_ptr<EditLayer> ptr = argc == 2 ?std::make_shared<EditLayer>(FONT_PATH, 16, argv[1]) : std::make_shared<EditLayer>(FONT_PATH, 16) ;
+
+        AppContainer ctnr(ptr, "lightbrite", 800, 600);
         ctnr.run();
     }
 
