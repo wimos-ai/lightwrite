@@ -57,6 +57,14 @@ void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
 
 bool EditLayer::handle_update(const SDL_Event &evt)
 {
+    if (select_save_line.has_value() && select_save_line.value()->has_value() && !select_save_line.value()->running())
+    {
+
+        filename = select_save_line.value()->value();
+        save_buffer();
+        select_save_line = std::nullopt;
+    }
+
     switch (evt.type)
     {
     case SDL_QUIT:
@@ -132,22 +140,7 @@ bool EditLayer::handle_update(const SDL_Event &evt)
             // do not check for file*, buffer_write will create the class anyways.
             if (keybinds_is_down(SDLK_LCTRL))
             {
-                if (filename.has_value())
-                {
-                    const char *fname = filename.value().c_str();
-                    auto fptr = fopen(fname, "w+");
-                    if (fptr)
-                    {
-                        context.write(fptr, fname);
-                        fclose(fptr);
-                        LOG_INFO("%s saved!", fname);
-                        file_saved = true;
-                    }
-                }
-                else
-                {
-                    // TODO: Choose File Save As
-                }
+                save_buffer();
             }
         }
         break;
@@ -189,6 +182,27 @@ bool EditLayer::handle_update(const SDL_Event &evt)
     return false;
 }
 
+void EditLayer::save_buffer()
+{
+    if (filename.has_value())
+    {
+        const char *fname = filename.value().c_str();
+        auto fptr = fopen(fname, "w+");
+        if (fptr)
+        {
+            context.write(fptr, fname);
+            fclose(fptr);
+            LOG_INFO("%s saved!", fname);
+            file_saved = true;
+        }
+    }
+    else
+    {
+        select_save_line = std::make_shared<LineSelector>("/home/willm/Desktop/lightwrite/data/MonoLisaRegular.ttf", 24, "/home/willm/Desktop/lightwrite/data/MonoLisaRegular.ttf", 16, "Choose File Name:");
+        next_layer = select_save_line;
+    }
+}
+
 bool EditLayer::running()
 {
     return true;
@@ -196,7 +210,14 @@ bool EditLayer::running()
 
 std::shared_ptr<AppLayer> EditLayer::next()
 {
-    return std::unique_ptr<AppLayer>();
+    if (next_layer.has_value())
+    {
+        return std::move(next_layer.value());
+    }
+    else
+    {
+        return {};
+    }
 }
 
 void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, bool file_saved)

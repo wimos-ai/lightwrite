@@ -8,6 +8,7 @@
 #include "logger.h"
 #include "filemanager.hpp"
 #include "app.hpp"
+#include "line_selector.hpp"
 
 class EditLayer : public AppLayer
 {
@@ -33,6 +34,8 @@ private:
     void render_text_line(SDL_Renderer *renderer, int w, int h, int lx, int ly, const char *line);
     void render_cursor(SDL_Renderer *renderer, int w, int h);
 
+    void save_buffer();
+
 private:
     static int generate_line_height(TTF_Font *font);
 
@@ -44,4 +47,6 @@ private:
     const int status_height;
     const int line_height;
     bool file_saved;
+    std::optional<std::shared_ptr<AppLayer>> next_layer;
+    std::optional<std::shared_ptr<LineSelector>> select_save_line;
 };

@@ -21,7 +21,7 @@
 #include <string.h>
 
 #define FONT_PATH DATA_DIR "/MonoLisaRegular.ttf"
-
+/*
 static int screen_width = 800;
 static int screen_height = 600;
 static const SDL_Color text_color = {255, 255, 255, 255};
@@ -42,7 +42,7 @@ static size_t file_man_cursor;
 static bool init_all(void);
 static void destroy_all(void);
 static bool handle_events(void);
-/*
+
 int main(int argc, char **argv)
 {
     if (argc > 2)
@@ -498,7 +498,6 @@ static bool handle_events(void)
 }
 */
 
-#include <iostream>
 int main()
 {
     if (!AppContainer::subsystem_init())
@@ -507,14 +506,8 @@ int main()
     }
 
     {
-        auto ptr = std::make_shared<LineSelector>(FONT_PATH, 72, FONT_PATH, 16, "LineSelectorTest");
-        AppContainer ctnr(ptr, "lightbrite", 800, 600);
+        AppContainer ctnr(std::make_shared<EditLayer>(FONT_PATH, 16), "lightbrite", 800, 600);
         ctnr.run();
-        if (ptr->has_value())
-        {
-            std::cout << ptr->value() << '\n';
-        }
-        
     }
 
     AppContainer::subsystem_destroy();
