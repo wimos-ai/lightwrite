@@ -1,8 +1,9 @@
 #include "edit_layer.hpp"
+#include "utilities.hpp"
 
 EditLayer::EditLayer(const char *font_path, int font_sz) : font(TTF_OpenFont(font_path, font_sz)),
-                                                           status_height(generate_line_height(this->font) + 2),
-                                                           line_height(generate_line_height(this->font)),
+                                                           status_height(::line_height(this->font) + 2),
+                                                           line_height(::line_height(this->font)),
                                                            file_saved(false)
 {
     if (!font)
@@ -21,14 +22,6 @@ EditLayer::EditLayer(const char *font_path, int font_sz, const char *fname) : Ed
     file_saved = true;
 }
 
-int EditLayer::generate_line_height(TTF_Font *font)
-{
-    const char *testLine = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
-    int h;
-    int w;
-    TTF_SizeText(font, testLine, &w, &h);
-    return h;
-}
 
 EditLayer::~EditLayer()
 {

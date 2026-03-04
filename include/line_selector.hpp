@@ -21,8 +21,6 @@ public:
 
     virtual std::shared_ptr<AppLayer> next() override;
 
-private:
-    static int generate_line_height(TTF_Font *font);
 
 private:
     TTF_Font *title_font{nullptr};

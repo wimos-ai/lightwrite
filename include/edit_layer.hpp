@@ -37,9 +37,6 @@ private:
     void save_buffer();
 
 private:
-    static int generate_line_height(TTF_Font *font);
-
-private:
     TTF_Font *font;
     Buffer context;
     std::optional<std::string> filename{std::nullopt};
