@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "app.hpp"
 #include "buffer.hpp"
 #include "font.h"
@@ -11,6 +13,7 @@ class EditLayer : public AppLayer
 {
 public:
     EditLayer(const char *font_path, int font_sz);
+    EditLayer(const char *font_path, int font_sz, const char* fname);
     ~EditLayer();
 
 public:
@@ -26,7 +29,7 @@ public:
     std::unique_ptr<AppLayer> next() override;
 
 private:
-    void render_filename(SDL_Renderer *renderer, int w, int h, const char *name, bool file_saved);
+    void render_filename(SDL_Renderer *renderer, int w, int h, bool file_saved);
     void render_text_line(SDL_Renderer *renderer, int w, int h, int lx, int ly, const char *line);
     void render_cursor(SDL_Renderer *renderer, int w, int h);
 
@@ -36,8 +39,9 @@ private:
 private:
     TTF_Font *font;
     Buffer context;
-    const char *filename{nullptr};
+    std::optional<std::string> filename{std::nullopt};
     SDL_Color text_color = {255, 255, 255, 255};
     const int status_height;
     const int line_height;
+    bool file_saved;
 };

@@ -2,13 +2,27 @@
 
 EditLayer::EditLayer(const char *font_path, int font_sz) : font(TTF_OpenFont(font_path, font_sz)),
                                                            status_height(generate_line_height(this->font) + 2),
-                                                           line_height(generate_line_height(this->font))
+                                                           line_height(generate_line_height(this->font)),
+                                                           file_saved(false)
 {
     if (!font)
     {
         LOG_FATAL("TTF_OpenFont-Error: %s", TTF_GetError());
         throw std::runtime_error("TTF_OpenFont");
     }
+}
+
+EditLayer::EditLayer(const char *font_path, int font_sz, const char *fname) : EditLayer(font_path, font_sz)
+{
+    filename = fname;
+    FILE *f = fopen(fname, "r");
+    if (f)
+    {
+        this->context = Buffer::read(f);
+        fclose(f);
+    }
+
+    file_saved = true;
 }
 
 int EditLayer::generate_line_height(TTF_Font *font)
@@ -27,13 +41,11 @@ EditLayer::~EditLayer()
 
 void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
 {
-    char name[1024] = "<untitled>";
 
-    bool file_saved = false;
     SDL_SetRenderDrawColor(renderer, 35, 35, 35, 255);
     SDL_RenderClear(renderer);
 
-    render_filename(renderer, w, h, name, file_saved);
+    render_filename(renderer, w, h, file_saved);
 
     for (size_t i = 0; i < context.lines.size(); ++i)
     {
@@ -60,8 +72,8 @@ bool EditLayer::handle_update(const SDL_Event &evt)
         {
         case SDLK_BACKSPACE:
         {
-
             context.del_cursor();
+            file_saved = false;
         }
         break;
         case SDLK_LEFT:
@@ -105,12 +117,14 @@ bool EditLayer::handle_update(const SDL_Event &evt)
         case SDLK_DELETE:
         {
             context.del();
+            file_saved = false;
         }
         break;
         case SDLK_RETURN:
         {
 
             context.push_line();
+            file_saved = false;
         }
         break;
         case SDLK_s:
@@ -118,19 +132,21 @@ bool EditLayer::handle_update(const SDL_Event &evt)
             // do not check for file*, buffer_write will create the class anyways.
             if (keybinds_is_down(SDLK_LCTRL))
             {
-                if (filename)
+                if (filename.has_value())
                 {
-                    auto fptr = fopen(filename, "w+");
+                    const char *fname = filename.value().c_str();
+                    auto fptr = fopen(fname, "w+");
                     if (fptr)
                     {
-                        context.write(fptr, filename);
+                        context.write(fptr, fname);
                         fclose(fptr);
-                        LOG_INFO("%s saved!", filename);
+                        LOG_INFO("%s saved!", fname);
+                        file_saved = true;
                     }
                 }
                 else
                 {
-                    filename = "Choose a filename!";
+                    // TODO: Choose File Save As
                 }
             }
         }
@@ -165,6 +181,7 @@ bool EditLayer::handle_update(const SDL_Event &evt)
     case SDL_TEXTINPUT:
     {
         context.ins_cursor(evt.text.text);
+        file_saved = false;
     }
     break;
     }
@@ -182,8 +199,18 @@ std::unique_ptr<AppLayer> EditLayer::next()
     return std::unique_ptr<AppLayer>();
 }
 
-void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, const char *name, bool file_saved)
+void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, bool file_saved)
 {
+    const char *name;
+    if (filename.has_value())
+    {
+        name = filename.value().c_str();
+    }
+    else
+    {
+        name = "<untitled>";
+    }
+
     SDL_Rect rect;
 
     rect.x = 0;
@@ -192,11 +219,6 @@ void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, const char
     rect.h = status_height;
     SDL_SetRenderDrawColor(renderer, 15, 15, 15, 255);
     SDL_RenderFillRect(renderer, &rect);
-
-    // if (filename)
-    // {
-    //     strcpy(name, filename);
-    // }
 
     Font_Data data = prepare_string(font, renderer, 1, 1, name, text_color);
     SDL_RenderCopy(renderer, data.texture, NULL, &data.rect);

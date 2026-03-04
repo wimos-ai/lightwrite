@@ -22,3 +22,4 @@ src/lightwrite
 config.guess~
 config.sub~
 install-sh~
+.vscode

@@ -505,7 +505,7 @@ int main()
     }
 
     {
-        AppContainer ctnr(std::make_unique<EditLayer>(FONT_PATH, 16), "lightbrite", 800, 600);
+        AppContainer ctnr(std::make_unique<EditLayer>(FONT_PATH, 16, "Snail.txt"), "lightbrite", 800, 600);
         ctnr.run();
     }
 
