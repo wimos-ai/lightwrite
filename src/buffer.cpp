@@ -67,6 +67,12 @@ Buffer Buffer::read(FILE *file)
     std::vector<std::string> lines;
     while (getline(&line, &length, file) != -1)
     {
+        if (line == nullptr)
+        {
+            break;
+        }
+        
+
         lines.emplace_back(line);
         if (lines.back().size() > 0 && lines.back().back() == '\n')
         {
