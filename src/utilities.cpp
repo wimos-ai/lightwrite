@@ -1,11 +1,12 @@
 #include "utilities.hpp"
+#include "logger.hpp"
 
 int line_height(TTF_Font *font)
 {
     const char *testLine = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
     int h;
     int w;
-    TTF_SizeText(font, testLine, &w, &h);
+    LOG_TTF_ERROR(TTF_SizeText(font, testLine, &w, &h));
     return h;
 }
 
@@ -16,9 +17,20 @@ SDL_Color get_color_negitive(SDL_Color other)
 
 RasterizedTextInfo::RasterizedTextInfo(TTF_Font *font, SDL_Renderer *renderer, const char *text, SDL_Color color)
 {
-    TTF_SizeText(font, text, &this->w, &this->h);
-    SDL_Surface *title_s = TTF_RenderText_Blended(font, text, color);
+
+    LOG_TTF_ERROR(TTF_SizeUTF8(font, text, &this->w, &this->h));
+    SDL_Surface *title_s = TTF_RenderUTF8_Blended(font, text, color);
+    if (!title_s)
+    {
+        LOG_ERROR("TTF_RenderUTF8_Blended: %s", TTF_GetError());
+    }
+
     this->tx = SDL_CreateTextureFromSurface(renderer, title_s);
+    if (!tx)
+    {
+        LOG_ERROR("SDL_CreateTextureFromSurface: %s", TTF_GetError());
+    }
+
     SDL_FreeSurface(title_s);
 }
 
@@ -30,5 +42,5 @@ RasterizedTextInfo::~RasterizedTextInfo()
 void RasterizedTextInfo::render(SDL_Renderer *renderer, int x, int y)
 {
     SDL_Rect r{x, y, this->w, this->h};
-    SDL_RenderCopy(renderer, this->tx, nullptr, &r);
+    LOG_SDL_ERROR(SDL_RenderCopy(renderer, this->tx, nullptr, &r));
 }

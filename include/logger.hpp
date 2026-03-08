@@ -1,5 +1,8 @@
 #pragma once
 
+#include "SDL.h"
+#include "SDL_ttf.h"
+
 enum Log_Level
 {
     LOG_LEVEL_FATAL,
@@ -19,6 +22,28 @@ void logger_print(Log_Level level, const char *file, int line, const char *messa
 
 #ifndef LOG_ERROR
 #define LOG_ERROR(...) logger_print(LOG_LEVEL_ERROR, __FILE__, __LINE__, __VA_ARGS__)
+#endif // !LOG_ERROR
+
+#ifndef LOG_SDL_ERROR
+#define LOG_SDL_ERROR(A, ...)                                                                \
+    do                                                                                       \
+    {                                                                                        \
+        if (A != 0)                                                                          \
+        {                                                                                    \
+            logger_print(LOG_LEVEL_ERROR, __FILE__, __LINE__, "%s: %s", #A, SDL_GetError()); \
+        }                                                                                    \
+    } while (0)
+#endif // !LOG_ERROR
+
+#ifndef LOG_TTF_ERROR
+#define LOG_TTF_ERROR(A, ...)                                                                \
+    do                                                                                       \
+    {                                                                                        \
+        if (A != 0)                                                                          \
+        {                                                                                    \
+            logger_print(LOG_LEVEL_ERROR, __FILE__, __LINE__, "%s: %s", #A, TTF_GetError()); \
+        }                                                                                    \
+    } while (0)
 #endif // !LOG_ERROR
 
 #ifndef LOG_WARN

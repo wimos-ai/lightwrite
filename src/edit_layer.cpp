@@ -33,15 +33,18 @@ EditLayer::~EditLayer()
 void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
 {
 
-    SDL_SetRenderDrawColor(renderer, 35, 35, 35, 255);
-    SDL_RenderClear(renderer);
+    LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, 35, 35, 35, 255));
+    LOG_SDL_ERROR(SDL_RenderClear(renderer));
 
     render_filename(renderer, w, h, file_saved);
 
     for (size_t i = 0; i < context.lines.size(); ++i)
     {
-        RasterizedTextInfo line(font, renderer, context.lines[i].buffer.c_str(), text_color);
-        line.render(renderer, 0, status_height + (i * line_height));
+        if (!context.lines[i].buffer.empty())
+        {
+            RasterizedTextInfo line(font, renderer, context.lines[i].buffer.c_str(), text_color);
+            line.render(renderer, 0, status_height + (i * line_height));
+        }
     }
 
     render_cursor(renderer, w, h);
@@ -240,8 +243,8 @@ void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, bool file_
     }
 
     SDL_Rect rect{0, 0, w, status_height};
-    SDL_SetRenderDrawColor(renderer, 15, 15, 15, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, 15, 15, 15, 255));
+    LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &rect));
 
     RasterizedTextInfo inf(this->font, renderer, name.c_str(), this->text_color);
     inf.render(renderer, 0, 0);
@@ -249,22 +252,20 @@ void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, bool file_
 
 void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h)
 {
-    char substr[4096];
 
     int width;  // used for font-width
     int height; // used for font-height
-    // Getting the string written from the left of the screen until the cursor.
-    memset(substr, 0, sizeof(substr));
-    strncpy(substr, context.get().buffer.c_str(), context.get().cursor);
 
-    TTF_SizeText(font, substr, &width, &height);
+    auto str = context.get().buffer.substr(0, context.get().cursor);
+
+    LOG_TTF_ERROR(TTF_SizeUTF8(font, str.c_str(), &width, &height));
 
     // Render Cursor
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255));
     SDL_Rect rect;
     rect.x = width;
     rect.y = status_height + (context.cursor * height);
     rect.w = 3;
     rect.h = height;
-    SDL_RenderFillRect(renderer, &rect);
+    LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &rect));
 }

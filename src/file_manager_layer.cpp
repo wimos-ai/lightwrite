@@ -17,6 +17,17 @@ FileManagerLayer::FileManagerLayer(const std::filesystem::path &directory_, cons
                                                                                                                                                         files(files_from_dir(dir)),
                                                                                                                                                         text_height(line_height(this->text_font))
 {
+    if (!title_font)
+    {
+        LOG_FATAL("TTF_OpenFont-Error: %s", TTF_GetError());
+        throw std::runtime_error("TTF_OpenFont");
+    }
+
+    if (!text_font)
+    {
+        LOG_FATAL("TTF_OpenFont-Error: %s", TTF_GetError());
+        throw std::runtime_error("TTF_OpenFont");
+    }
 }
 
 FileManagerLayer::~FileManagerLayer()
@@ -27,15 +38,9 @@ FileManagerLayer::~FileManagerLayer()
 
 void FileManagerLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
 {
-    if (SDL_SetRenderDrawColor(renderer, bg_color.r, bg_color.g, bg_color.b, bg_color.a) != 0)
-    {
-        LOG_ERROR("Error: %s", SDL_GetError());
-    }
+    LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, bg_color.r, bg_color.g, bg_color.b, bg_color.a));
     SDL_Rect r{0, 0, w, h};
-    if (SDL_RenderFillRect(renderer, &r) != 0)
-    {
-        LOG_ERROR("Error: %s", SDL_GetError());
-    }
+    LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &r));
 
     RasterizedTextInfo title(title_font, renderer, this->title.c_str(), title_color);
 
@@ -51,8 +56,8 @@ void FileManagerLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w,
             RasterizedTextInfo line(text_font, renderer, this->files[i].c_str(), get_color_negitive(text_color));
             SDL_Rect r{0, line_y, line.w, line.h};
             auto sel_bg{get_color_negitive(bg_color)};
-            SDL_SetRenderDrawColor(renderer, sel_bg.r, sel_bg.g, sel_bg.b, sel_bg.a);
-            SDL_RenderFillRect(renderer, &r);
+            LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, sel_bg.r, sel_bg.g, sel_bg.b, sel_bg.a));
+            LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &r));
             line.render(renderer, 0, title_height + (text_height * nloop));
         }
         else

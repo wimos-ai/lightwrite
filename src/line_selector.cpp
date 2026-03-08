@@ -2,6 +2,7 @@
 #include "keybinds.hpp"
 #include "utilities.hpp"
 #include "utilities.hpp"
+#include "logger.hpp"
 
 LineSelector::LineSelector(const char *title_font, int title_sz, const char *text_font, int text_sz, const char *title) : title_font(TTF_OpenFont(title_font, title_sz)),
                                                                                                                           text_font(TTF_OpenFont(text_font, text_sz)),
@@ -9,6 +10,17 @@ LineSelector::LineSelector(const char *title_font, int title_sz, const char *tex
                                                                                                                           text_height(line_height(this->text_font)),
                                                                                                                           title(title)
 {
+    if (!title_font)
+    {
+        LOG_FATAL("TTF_OpenFont-Error: %s", TTF_GetError());
+        throw std::runtime_error("TTF_OpenFont");
+    }
+
+    if (!text_font)
+    {
+        LOG_FATAL("TTF_OpenFont-Error: %s", TTF_GetError());
+        throw std::runtime_error("TTF_OpenFont");
+    }
 }
 
 LineSelector::~LineSelector()
@@ -29,8 +41,8 @@ void LineSelector::render(SDL_Window *window, SDL_Renderer *renderer, int w, int
     int y = (h / 2) - (total_height / 2);
     SDL_Rect fill_area{x, y, total_width, total_height};
 
-    SDL_SetRenderDrawColor(renderer, bg_color.r, bg_color.g, bg_color.b, bg_color.a);
-    SDL_RenderFillRect(renderer, &fill_area);
+    LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, bg_color.r, bg_color.g, bg_color.b, bg_color.a));
+    LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &fill_area));
 
     title_tx.render(renderer, x + 1, y + 1);
     text_tx.render(renderer, x + 1, y + 2 + title_tx.h);

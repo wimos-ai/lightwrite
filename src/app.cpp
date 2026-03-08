@@ -76,8 +76,8 @@ void AppContainer::update_layers()
 void AppContainer::render_layers()
 {
     // Render from bottom up
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255));
+    LOG_SDL_ERROR(SDL_RenderClear(renderer));
     for (auto &layer : layers)
     {
         layer->render(window, renderer, w, h);
@@ -102,7 +102,7 @@ void AppContainer::prehandle_evt(const SDL_Event &evt)
         {
             w = evt.window.data1;
             h = evt.window.data2;
-            SDL_RenderSetLogicalSize(renderer, w, h);
+            LOG_SDL_ERROR(SDL_RenderSetLogicalSize(renderer, w, h));
         }
     }
     if (evt.type == SDL_KEYDOWN)
