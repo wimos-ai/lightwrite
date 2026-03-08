@@ -1,7 +1,7 @@
 #include "app.hpp"
 
 #include "logger.h"
-#include "keybinds.h"
+#include "keybinds.hpp"
 
 bool AppContainer::subsystem_init()
 {

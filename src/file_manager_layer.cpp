@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include "utilities.hpp"
-#include "keybinds.h"
+#include "keybinds.hpp"
 
 namespace fs = std::filesystem;
 

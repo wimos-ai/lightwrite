@@ -1,5 +1,5 @@
 #include "buffer.hpp"
-#include "keybinds.h"
+#include "keybinds.hpp"
 #include "logger.h"
 #include "app.hpp"
 #include "edit_layer.hpp"
