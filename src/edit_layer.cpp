@@ -169,7 +169,7 @@ bool EditLayer::handle_update(const SDL_Event &evt)
                 {
                     try
                     {
-                        auto cwd = std::filesystem::current_path().parent_path();
+                        auto cwd = std::filesystem::current_path();
                         fman.emplace(std::make_shared<FileManagerLayer>(cwd, FONT_PATH, 24, FONT_PATH, 16));
                     }
                     catch (std::filesystem::filesystem_error &e)
