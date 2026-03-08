@@ -12,7 +12,6 @@ public:
     Buffer &operator=(const Buffer &other) = default;
     Buffer &operator=(Buffer &&other) = default;
 
-
 public:
     class Line
     {
@@ -43,8 +42,18 @@ public:
 public:
     auto operator<=>(const Buffer &) const = default;
 
+    Line &get()
+    {
+        return lines[cursor];
+    }
+
+    const Line &get() const
+    {
+        return lines[cursor];
+    }
+
 public:
-    static Buffer read( const char *filename);
+    static Buffer read(const char *filename);
     bool write(const char *filename);
 
 public:

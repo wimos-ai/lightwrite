@@ -72,7 +72,7 @@ Buffer Buffer::read(const char *filename)
     }
 
     Buffer b;
-    b.lines = std::vector<Line>(lines.size());
+    b.lines = std::vector<Line>(lines.size()+1);
     for (size_t i = 0; i < lines.size(); i++)
     {
         b.lines[i].buffer = std::move(lines[i]);

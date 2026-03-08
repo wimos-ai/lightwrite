@@ -1,5 +1,7 @@
 #include "edit_layer.hpp"
 #include "utilities.hpp"
+
+#include <iostream>
 #define FONT_PATH DATA_DIR "/MonoLisaRegular.ttf"
 
 EditLayer::EditLayer(const char *font_path, int font_sz) : font(TTF_OpenFont(font_path, font_sz)),
@@ -63,22 +65,16 @@ bool EditLayer::handle_update(const SDL_Event &evt)
         {
             auto fname = fman.value()->value();
 
-            std::filesystem::path f{fname};
-
-            if (f.has_filename()) // This is a file
+            try
             {
-                try
-                {
-                    this->context = Buffer::read(f.c_str());
-                }
-                catch(const std::exception& e)
-                {
-                    // File does not exist
-                    this->context = Buffer();
-                }
-                this->filename = f;
-                
+                this->context = Buffer::read(fname.c_str());
             }
+            catch (const std::exception &e)
+            {
+                // File does not exist
+                this->context = Buffer();
+            }
+            this->filename = fname;
         }
         fman = std::nullopt;
     }
@@ -165,7 +161,23 @@ bool EditLayer::handle_update(const SDL_Event &evt)
             // Filemanager keybind: Ctrl + Shift + f
             if (keybinds_is_down(SDLK_LCTRL) && keybinds_is_down(SDLK_LSHIFT))
             {
-                fman.emplace(std::make_shared<FileManagerLayer>(filename.value_or(".").c_str(), FONT_PATH, 24, FONT_PATH, 16));
+                if (filename.has_value())
+                {
+                    fman.emplace(std::make_shared<FileManagerLayer>(filename.value().parent_path(), FONT_PATH, 24, FONT_PATH, 16));
+                }
+                else
+                {
+                    try
+                    {
+                        auto cwd = std::filesystem::current_path().parent_path();
+                        std::cout << cwd << '\n';
+                        fman.emplace(std::make_shared<FileManagerLayer>(cwd, FONT_PATH, 24, FONT_PATH, 16));
+                    }catch(std::filesystem::filesystem_error& e){
+                        std::cout << e.what() << " Code: " << e.code() << '\n';
+                        std::cout << "So Sad 😔" << std::endl;
+                    }
+                }
+
                 next_layer = fman;
             }
         }
@@ -275,7 +287,7 @@ void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h)
     int height; // used for font-height
     // Getting the string written from the left of the screen until the cursor.
     memset(substr, 0, sizeof(substr));
-    strncpy(substr, context.lines[context.cursor].buffer.c_str(), context.lines[context.cursor].cursor);
+    strncpy(substr, context.get().buffer.c_str(), context.get().cursor);
 
     TTF_SizeText(font, substr, &width, &height);
 

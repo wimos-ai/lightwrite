@@ -1,19 +1,20 @@
 #include "file_manager_layer.hpp"
 #include <filesystem>
 #include <iostream>
+#include <algorithm>
 
 #include "utilities.hpp"
 #include "keybinds.h"
 
 namespace fs = std::filesystem;
 
-FileManagerLayer::FileManagerLayer(const char *directory_, const char *title_font, int title_sz, const char *text_font, int text_sz) : dir(directory_),
-                                                                                                                                       title_font(TTF_OpenFont(title_font, title_sz)),
-                                                                                                                                       text_font(TTF_OpenFont(text_font, text_sz)),
-                                                                                                                                       title(std::string("Directory: ") + dir.c_str()),
-                                                                                                                                       title_height(line_height(this->title_font)),
-                                                                                                                                       files(files_from_dir(dir)),
-                                                                                                                                       text_height(line_height(this->text_font))
+FileManagerLayer::FileManagerLayer(const std::filesystem::path &directory_, const char *title_font, int title_sz, const char *text_font, int text_sz) : dir(directory_),
+                                                                                                                                                        title_font(TTF_OpenFont(title_font, title_sz)),
+                                                                                                                                                        text_font(TTF_OpenFont(text_font, text_sz)),
+                                                                                                                                                        title(std::string("Directory: ") + dir.c_str()),
+                                                                                                                                                        title_height(line_height(this->title_font)),
+                                                                                                                                                        files(files_from_dir(dir)),
+                                                                                                                                                        text_height(line_height(this->text_font))
 {
 }
 
@@ -70,7 +71,7 @@ bool FileManagerLayer::handle_update(const SDL_Event &evt)
             auto str = line_sel.value()->value();
             if (str.size() > 0)
             {
-                this->emplace(str);
+                this->emplace(dir / str);
                 this->is_running = false;
             }
         }
@@ -97,7 +98,7 @@ bool FileManagerLayer::handle_update(const SDL_Event &evt)
         {
             if (this->files.size() > 0)
             {
-                this->emplace(files[this->start_render_idx]);
+                this->emplace(dir / files[this->start_render_idx]);
                 is_running = false;
             }
         }
@@ -133,7 +134,7 @@ std::shared_ptr<AppLayer> FileManagerLayer::next()
     }
 }
 
-std::vector<std::string> FileManagerLayer::files_from_dir(std::filesystem::path& p)
+std::vector<std::string> FileManagerLayer::files_from_dir(std::filesystem::path &p)
 {
     std::vector<std::string> files;
 
@@ -145,5 +146,6 @@ std::vector<std::string> FileManagerLayer::files_from_dir(std::filesystem::path&
             files.emplace_back(relative);
         }
     }
+    std::sort(files.begin(), files.end());
     return files;
 }

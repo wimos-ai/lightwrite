@@ -41,7 +41,7 @@ private:
 private:
     TTF_Font *font;
     Buffer context;
-    std::optional<std::string> filename{std::nullopt};
+    std::optional<std::filesystem::path> filename{std::nullopt};
     SDL_Color text_color = {255, 255, 255, 255};
     const int status_height;
     const int line_height;

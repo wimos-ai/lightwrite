@@ -6,10 +6,10 @@
 #include <filesystem>
 #include "line_selector.hpp"
 
-class FileManagerLayer : public ResourceSelectionLayer<std::string>
+class FileManagerLayer : public ResourceSelectionLayer<std::filesystem::path>
 {
 public:
-    FileManagerLayer(const char *directory, const char *title_font, int title_sz, const char *text_font, int text_sz);
+    FileManagerLayer(const std::filesystem::path& dir, const char *title_font, int title_sz, const char *text_font, int text_sz);
 
     ~FileManagerLayer();
 
