@@ -5,6 +5,7 @@
 
 #include "utilities.hpp"
 #include "keybinds.hpp"
+#include "logger.hpp"
 
 namespace fs = std::filesystem;
 
@@ -28,12 +29,12 @@ void FileManagerLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w,
 {
     if (SDL_SetRenderDrawColor(renderer, bg_color.r, bg_color.g, bg_color.b, bg_color.a) != 0)
     {
-        std::cerr << "ERROR: " << SDL_GetError() << '\n';
+        LOG_ERROR("Error: %s", SDL_GetError());
     }
     SDL_Rect r{0, 0, w, h};
     if (SDL_RenderFillRect(renderer, &r) != 0)
     {
-        std::cerr << "ERROR: " << SDL_GetError() << '\n';
+        LOG_ERROR("Error: %s", SDL_GetError());
     }
 
     RasterizedTextInfo title(title_font, renderer, this->title.c_str(), title_color);

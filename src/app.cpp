@@ -1,6 +1,6 @@
 #include "app.hpp"
 
-#include "logger.h"
+#include "logger.hpp"
 #include "keybinds.hpp"
 
 bool AppContainer::subsystem_init()

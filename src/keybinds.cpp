@@ -1,5 +1,5 @@
 #include "keybinds.hpp"
-#include "logger.h"
+#include "logger.hpp"
 
 #include <SDL2/SDL_keycode.h>
 #include <array>

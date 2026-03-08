@@ -175,9 +175,7 @@ bool EditLayer::handle_update(const SDL_Event &evt)
                     }
                     catch (std::filesystem::filesystem_error &e)
                     {
-                        std::cerr << "In file: " << __FILE__ << ':' << __LINE__ << '\n';
-                        std::cerr << "\t std::filesystem::filesystem_error: #" << e.code() << '\n';
-                        std::cerr << '\t' << e.what() << '\n';
+                        LOG_ERROR("std::filesystem::filesystem_error: #%d: %s", e.code(), e.what());
                     }
                 }
 

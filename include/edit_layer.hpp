@@ -5,7 +5,7 @@
 #include "app.hpp"
 #include "buffer.hpp"
 #include "keybinds.hpp"
-#include "logger.h"
+#include "logger.hpp"
 #include "app.hpp"
 #include "line_selector.hpp"
 #include "file_manager_layer.hpp"
