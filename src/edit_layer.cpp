@@ -38,12 +38,13 @@ void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
 
     render_filename(renderer, w, h, file_saved);
 
-    for (size_t i = 0; i < context.lines.size(); ++i)
+    size_t nloops{0};
+    for (size_t i = context.cursor; i < context.lines.size(); (i++, nloops++))
     {
         if (!context.lines[i].buffer.empty())
         {
             RasterizedTextInfo line(font, renderer, context.lines[i].buffer.c_str(), text_color);
-            line.render(renderer, 0, status_height + (i * line_height));
+            line.render(renderer, 0, status_height + (nloops * line_height));
         }
     }
 
@@ -264,7 +265,7 @@ void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h)
     LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255));
     SDL_Rect rect;
     rect.x = width;
-    rect.y = status_height + (context.cursor * height);
+    rect.y = status_height;
     rect.w = 3;
     rect.h = height;
     LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &rect));
