@@ -2,7 +2,6 @@
 #include "font.h"
 #include "keybinds.h"
 #include "logger.h"
-#include "filemanager.hpp"
 #include "app.hpp"
 #include "edit_layer.hpp"
 #include "line_selector.hpp"
