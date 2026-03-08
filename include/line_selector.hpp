@@ -1,7 +1,7 @@
 #pragma once
 #include "app.hpp"
+#include "utilities.hpp"
 
-#include "font.h"
 
 class LineSelector : public ResourceSelectionLayer<std::string>
 {

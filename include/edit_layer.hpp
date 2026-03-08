@@ -4,12 +4,12 @@
 
 #include "app.hpp"
 #include "buffer.hpp"
-#include "font.h"
 #include "keybinds.h"
 #include "logger.h"
 #include "app.hpp"
 #include "line_selector.hpp"
 #include "file_manager_layer.hpp"
+#include "utilities.hpp"
 
 class EditLayer : public AppLayer
 {
@@ -32,7 +32,6 @@ public:
 
 private:
     void render_filename(SDL_Renderer *renderer, int w, int h, bool file_saved);
-    void render_text_line(SDL_Renderer *renderer, int w, int h, int lx, int ly, const char *line);
     void render_cursor(SDL_Renderer *renderer, int w, int h);
 
     void save_buffer();

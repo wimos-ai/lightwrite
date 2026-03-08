@@ -40,7 +40,8 @@ void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
 
     for (size_t i = 0; i < context.lines.size(); ++i)
     {
-        render_text_line(renderer, w, h, 0, status_height + (i * line_height), context.lines[i].buffer.c_str());
+        RasterizedTextInfo line(font, renderer, context.lines[i].buffer.c_str(), text_color);
+        line.render(renderer, 0, status_height + (i * line_height));
     }
 
     render_cursor(renderer, w, h);
@@ -234,51 +235,18 @@ std::shared_ptr<AppLayer> EditLayer::next()
 
 void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, bool file_saved)
 {
-    const char *name;
-    if (filename.has_value())
+    std::string name = filename.has_value() ? filename.value().c_str() : "<untitled>";
+    if (!file_saved)
     {
-        name = filename.value().c_str();
-    }
-    else
-    {
-        name = "<untitled>";
+        name.append("*");
     }
 
-    SDL_Rect rect;
-
-    rect.x = 0;
-    rect.y = 0;
-    rect.w = w;
-    rect.h = status_height;
+    SDL_Rect rect{0, 0, w, status_height};
     SDL_SetRenderDrawColor(renderer, 15, 15, 15, 255);
     SDL_RenderFillRect(renderer, &rect);
 
-    Font_Data data = prepare_string(font, renderer, 1, 1, name, text_color);
-    SDL_RenderCopy(renderer, data.texture, NULL, &data.rect);
-    SDL_DestroyTexture(data.texture);
-
-    if (!file_saved)
-    {
-        int width, height;
-        TTF_SizeText(font, name, &width, &height);
-
-        SDL_RenderSetScale(renderer, 0.9f, 0.9f);
-        data = prepare_string(font, renderer, (2 + width) * 1.1f, 2, "*", text_color);
-        SDL_RenderCopy(renderer, data.texture, NULL, &data.rect);
-        SDL_DestroyTexture(data.texture);
-        SDL_RenderSetScale(renderer, 1.f, 1.f);
-    }
-}
-
-void EditLayer::render_text_line(SDL_Renderer *renderer, int w, int h, int lx, int ly, const char *line)
-{
-    int width;  // used for font-width
-    int height; // used for font-height
-    TTF_SizeText(font, line, &width, &height);
-
-    Font_Data data = prepare_string(font, renderer, lx, ly, line, text_color);
-    SDL_RenderCopy(renderer, data.texture, NULL, &data.rect);
-    SDL_DestroyTexture(data.texture);
+    RasterizedTextInfo inf(this->font, renderer, name.c_str(), this->text_color);
+    inf.render(renderer, 0, 0);
 }
 
 void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h)

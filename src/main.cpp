@@ -1,5 +1,4 @@
 #include "buffer.hpp"
-#include "font.h"
 #include "keybinds.h"
 #include "logger.h"
 #include "app.hpp"
