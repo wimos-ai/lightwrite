@@ -64,6 +64,9 @@ target_compile_definitions(MyProjectLib PUBLIC
 # -------------------------
 # Main executable
 # -------------------------
+set(PROJECT_ROOT ${CMAKE_SOURCE_DIR}/)
+cmake_path(NORMAL_PATH PROJECT_ROOT OUTPUT_VARIABLE PROJECT_ROOT_NORMALIZED)
+add_compile_options(-ffile-prefix-map=${PROJECT_ROOT_NORMALIZED}=)
 
 add_executable(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/main.cpp)  # adjust if needed
 target_link_libraries(${PROJECT_NAME} PRIVATE MyProjectLib)
