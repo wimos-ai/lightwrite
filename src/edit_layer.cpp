@@ -170,11 +170,13 @@ bool EditLayer::handle_update(const SDL_Event &evt)
                     try
                     {
                         auto cwd = std::filesystem::current_path().parent_path();
-                        std::cout << cwd << '\n';
                         fman.emplace(std::make_shared<FileManagerLayer>(cwd, FONT_PATH, 24, FONT_PATH, 16));
-                    }catch(std::filesystem::filesystem_error& e){
-                        std::cout << e.what() << " Code: " << e.code() << '\n';
-                        std::cout << "So Sad 😔" << std::endl;
+                    }
+                    catch (std::filesystem::filesystem_error &e)
+                    {
+                        std::cerr << "In file: " << __FILE__ << ':' << __LINE__ << '\n';
+                        std::cerr << "\t std::filesystem::filesystem_error: #" << e.code() << '\n';
+                        std::cerr << '\t' << e.what() << '\n';
                     }
                 }
 
