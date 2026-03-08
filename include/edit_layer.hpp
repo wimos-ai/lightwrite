@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include <filesystem>
 
 #include "app.hpp"
 #include "buffer.hpp"
@@ -9,12 +10,13 @@
 #include "filemanager.hpp"
 #include "app.hpp"
 #include "line_selector.hpp"
+#include "file_manager_layer.hpp"
 
 class EditLayer : public AppLayer
 {
 public:
     EditLayer(const char *font_path, int font_sz);
-    EditLayer(const char *font_path, int font_sz, const char* fname);
+    EditLayer(const char *font_path, int font_sz, const char *fname);
     ~EditLayer();
 
 public:
@@ -45,5 +47,6 @@ private:
     const int line_height;
     bool file_saved;
     std::optional<std::shared_ptr<AppLayer>> next_layer;
+    std::optional<std::shared_ptr<FileManagerLayer>> fman;
     std::optional<std::shared_ptr<LineSelector>> select_save_line;
 };

@@ -494,6 +494,7 @@ static bool handle_events(void)
 }
 */
 #include <iostream>
+#include <file_manager_layer.hpp>
 int main(int argc, const char *const *argv)
 {
     if (!AppContainer::subsystem_init())
@@ -502,8 +503,7 @@ int main(int argc, const char *const *argv)
     }
 
     {
-        std::shared_ptr<EditLayer> ptr = argc == 2 ? std::make_shared<EditLayer>(FONT_PATH, 16, argv[1]) : std::make_shared<EditLayer>(FONT_PATH, 16);
-
+        auto ptr = argc == 2 ? std::make_shared<EditLayer>(FONT_PATH, 16, argv[1]) : std::make_shared<EditLayer>(FONT_PATH, 16);
         AppContainer ctnr(ptr, "lightbrite", 800, 600);
         ctnr.run();
     }

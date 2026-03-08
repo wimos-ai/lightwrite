@@ -1,5 +1,6 @@
 #include "edit_layer.hpp"
 #include "utilities.hpp"
+#define FONT_PATH DATA_DIR "/MonoLisaRegular.ttf"
 
 EditLayer::EditLayer(const char *font_path, int font_sz) : font(TTF_OpenFont(font_path, font_sz)),
                                                            status_height(::line_height(this->font) + 2),
@@ -21,7 +22,6 @@ EditLayer::EditLayer(const char *font_path, int font_sz, const char *fname) : Ed
 
     file_saved = true;
 }
-
 
 EditLayer::~EditLayer()
 {
@@ -46,12 +46,41 @@ void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
 
 bool EditLayer::handle_update(const SDL_Event &evt)
 {
-    if (select_save_line.has_value() && select_save_line.value()->has_value() && !select_save_line.value()->running())
+    if (select_save_line.has_value() && !select_save_line.value()->running())
     {
 
-        filename = select_save_line.value()->value();
-        save_buffer();
+        if (select_save_line.value()->has_value())
+        {
+            filename = select_save_line.value()->value();
+            save_buffer();
+        }
         select_save_line = std::nullopt;
+    }
+
+    if (fman.has_value() && !fman.value()->running())
+    {
+        if (fman.value()->has_value())
+        {
+            auto fname = fman.value()->value();
+
+            std::filesystem::path f{fname};
+
+            if (f.has_filename()) // This is a file
+            {
+                try
+                {
+                    this->context = Buffer::read(f.c_str());
+                }
+                catch(const std::exception& e)
+                {
+                    // File does not exist
+                    this->context = Buffer();
+                }
+                this->filename = f;
+                
+            }
+        }
+        fman = std::nullopt;
     }
 
     switch (evt.type)
@@ -63,8 +92,6 @@ bool EditLayer::handle_update(const SDL_Event &evt)
     break;
     case SDL_KEYDOWN:
     {
-        keybinds_on_down(evt.key.keysym.sym);
-
         switch (evt.key.keysym.sym)
         {
         case SDLK_BACKSPACE:
@@ -138,26 +165,12 @@ bool EditLayer::handle_update(const SDL_Event &evt)
             // Filemanager keybind: Ctrl + Shift + f
             if (keybinds_is_down(SDLK_LCTRL) && keybinds_is_down(SDLK_LSHIFT))
             {
-                // TODO: Open File Manager
+                fman.emplace(std::make_shared<FileManagerLayer>(filename.value_or(".").c_str(), FONT_PATH, 24, FONT_PATH, 16));
+                next_layer = fman;
             }
         }
         break;
-        case SDLK_a:
-        {
-            // File creation keybind: Ctrl + a (in Filemanager)
-            /*
-            if (keybinds_is_down(SDLK_LCTRL) && file_man_opened && !filename)
-            {
-                //TODO: Open File Manager
-            }*/
         }
-        break;
-        }
-    }
-    break;
-    case SDL_KEYUP:
-    {
-        keybinds_on_up(evt.key.keysym.sym);
     }
     break;
     case SDL_TEXTINPUT:

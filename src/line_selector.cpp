@@ -22,9 +22,8 @@ void LineSelector::render(SDL_Window *window, SDL_Renderer *renderer, int w, int
     RasterizedTextInfo title_tx(title_font, renderer, this->title.c_str(), title_color);
     RasterizedTextInfo text_tx(text_font, renderer, this->text.c_str(), text_color);
 
-
     int total_height = text_height + title_height + 2;
-    int total_width = std::max(title_tx.w , text_tx.w) + 2;
+    int total_width = std::max(title_tx.w, text_tx.w) + 2;
 
     int x = (w / 2) - (total_width / 2);
     int y = (h / 2) - (total_height / 2);
@@ -33,11 +32,8 @@ void LineSelector::render(SDL_Window *window, SDL_Renderer *renderer, int w, int
     SDL_SetRenderDrawColor(renderer, bg_color.r, bg_color.g, bg_color.b, bg_color.a);
     SDL_RenderFillRect(renderer, &fill_area);
 
-    SDL_Rect title_area{x + 1, y + 1, title_tx.w, title_tx.h};
-    SDL_Rect text_area{x + 1, y + 2 + text_tx.w, text_tx.h, text_height};
-
-    SDL_RenderCopy(renderer, title_tx.tx, nullptr, &title_area);
-    SDL_RenderCopy(renderer, text_tx.tx, nullptr, &text_area);
+    title_tx.render(renderer, x + 1, y + 1);
+    text_tx.render(renderer, x + 1, y + 2 + title_tx.h);
 }
 
 bool LineSelector::handle_update(const SDL_Event &evt)
@@ -46,7 +42,6 @@ bool LineSelector::handle_update(const SDL_Event &evt)
     {
     case SDL_KEYDOWN:
     {
-        keybinds_on_down(evt.key.keysym.sym);
 
         switch (evt.key.keysym.sym)
         {
@@ -70,12 +65,6 @@ bool LineSelector::handle_update(const SDL_Event &evt)
             is_running = false; // Exit on Escape
         }
         }
-        return true; // No further propegation
-    }
-    break;
-    case SDL_KEYUP:
-    {
-        keybinds_on_up(evt.key.keysym.sym);
         return true; // No further propegation
     }
     break;

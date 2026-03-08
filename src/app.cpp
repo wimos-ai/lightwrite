@@ -1,6 +1,7 @@
 #include "app.hpp"
 
 #include "logger.h"
+#include "keybinds.h"
 
 bool AppContainer::subsystem_init()
 {
@@ -59,6 +60,7 @@ void AppContainer::update_layers()
     SDL_Event evt;
     while (SDL_PollEvent(&evt))
     {
+        prehandle_evt(evt);
         for (auto itr = layers.rbegin(); itr != layers.rend(); itr++)
         {
             // If the event is handled by the layer, stop propegating it
@@ -92,12 +94,8 @@ void AppContainer::check_new_layer()
     }
 }
 
-void AppContainer::handle_uncaught_event(const SDL_Event &evt)
+void AppContainer::prehandle_evt(const SDL_Event &evt)
 {
-    if (evt.type == SDL_QUIT)
-    {
-        this->running = false;
-    }
     if (evt.type == SDL_WINDOWEVENT)
     {
         if (evt.window.event == SDL_WINDOWEVENT_SIZE_CHANGED && renderer)
@@ -106,6 +104,22 @@ void AppContainer::handle_uncaught_event(const SDL_Event &evt)
             h = evt.window.data2;
             SDL_RenderSetLogicalSize(renderer, w, h);
         }
+    }
+    if (evt.type == SDL_KEYDOWN)
+    {
+        keybinds_on_down(evt.key.keysym.sym);
+    }
+    if (evt.type == SDL_KEYUP)
+    {
+        keybinds_on_up(evt.key.keysym.sym);
+    }
+}
+
+void AppContainer::handle_uncaught_event(const SDL_Event &evt)
+{
+    if (evt.type == SDL_QUIT)
+    {
+        this->running = false;
     }
 }
 

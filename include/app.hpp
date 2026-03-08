@@ -50,6 +50,9 @@ private:
 
     void check_new_layer();
 
+private:
+    void prehandle_evt(const SDL_Event& evt);
+
     void handle_uncaught_event(const SDL_Event &evt);
 
 private:
