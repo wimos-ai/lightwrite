@@ -200,7 +200,7 @@ bool EditLayer::handle_update(const SDL_Event &evt)
     case SDL_MOUSEWHEEL:
     {
         int d_l = -evt.wheel.y;
-        int cf = std::clamp((int)context.cursor + d_l, 0, (int)context.lines.size());
+        int cf = std::clamp((int)context.cursor + d_l, 0, (int)context.lines.size()-1);
         context.cursor = cf;
     }
     break;
