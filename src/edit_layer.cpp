@@ -2,6 +2,7 @@
 #include "utilities.hpp"
 
 #include <iostream>
+#include <algorithm>
 #define FONT_PATH DATA_DIR "/MonoLisaRegular.ttf"
 
 EditLayer::EditLayer(const char *font_path, int font_sz) : font(TTF_OpenFont(font_path, font_sz)),
@@ -194,6 +195,13 @@ bool EditLayer::handle_update(const SDL_Event &evt)
     {
         context.ins_cursor(evt.text.text);
         file_saved = false;
+    }
+    break;
+    case SDL_MOUSEWHEEL:
+    {
+        int d_l = -evt.wheel.y;
+        int cf = std::clamp((int)context.cursor + d_l, 0, (int)context.lines.size());
+        context.cursor = cf;
     }
     break;
     }
