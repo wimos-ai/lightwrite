@@ -100,6 +100,7 @@ std::vector<Buffer::Line>::iterator Buffer::get_active_line()
 
 std::pair<std::vector<Buffer::Line>::iterator, std::vector<Buffer::Line>::iterator> Buffer::get_render_zone(int nlines)
 {
+    // TODO
     return std::pair<std::vector<Line>::iterator, std::vector<Line>::iterator>();
 }
 
