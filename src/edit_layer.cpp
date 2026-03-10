@@ -104,40 +104,23 @@ bool EditLayer::handle_update(const SDL_Event &evt)
         break;
         case SDLK_LEFT:
         {
-            if (context.get_cursor_row() > 0)
-            {
-                context.lines[context.cursor].cursor--;
-            }
+            context.left();
         }
         break;
         case SDLK_RIGHT:
         {
-            if (context.get_cursor_row() <
-                context.lines[context.cursor].buffer.size())
-            {
-                context.lines[context.cursor].cursor++;
-            }
+            context.right();
         }
         break;
         case SDLK_UP:
         {
-            if (context.cursor > 0)
-            {
-                context.cursor--;
-                context.lines[context.cursor].cursor =
-                    context.lines[context.cursor].buffer.size();
-            }
+            context.up();
         }
         break;
         case SDLK_DOWN:
         {
 
-            if (context.cursor < (context.lines.size() - 1))
-            {
-                context.cursor++;
-                context.lines[context.cursor].cursor =
-                    context.lines[context.cursor].buffer.size();
-            }
+            context.down();
         }
         break;
         case SDLK_DELETE:
@@ -199,9 +182,7 @@ bool EditLayer::handle_update(const SDL_Event &evt)
     break;
     case SDL_MOUSEWHEEL:
     {
-        int d_l = -evt.wheel.y;
-        int cf = std::clamp((int)context.cursor + d_l, 0, (int)context.lines.size()-1);
-        context.cursor = cf;
+        context.scroll(-evt.wheel.y);
     }
     break;
     }

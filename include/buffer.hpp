@@ -52,6 +52,20 @@ public:
         return lines[cursor];
     }
 
+    void up();
+
+    void down();
+
+    void right();
+
+    void left();
+
+    void scroll(int nlines);
+
+public:
+    std::vector<Line>::iterator get_active_line();
+    std::pair<std::vector<Line>::iterator, std::vector<Line>::iterator> get_render_zone(int nlines);
+
 public:
     static Buffer read(const char *filename);
     bool write(const char *filename);

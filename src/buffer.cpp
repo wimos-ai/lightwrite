@@ -1,6 +1,7 @@
 #include "buffer.hpp"
 #include <cstring>
 #include <fstream>
+#include <algorithm>
 
 void Buffer::Line::ins_cursor(const char *text)
 {
@@ -61,6 +62,55 @@ size_t Buffer::get_cursor_row()
     return lines[cursor].cursor;
 }
 
+void Buffer::up()
+{
+    if (cursor > 0)
+    {
+        cursor--;
+    }
+}
+
+void Buffer::down()
+{
+
+    if (cursor < (lines.size() - 1))
+    {
+        cursor++;
+    }
+}
+
+void Buffer::left()
+{
+    if (this->get_cursor_row() > 0)
+    {
+        lines[cursor].cursor--;
+    }
+}
+
+void Buffer::scroll(int nlines)
+{
+    int cf = std::clamp((int)cursor + nlines, 0, (int)lines.size() - 1);
+    cursor = cf;
+}
+
+std::vector<Buffer::Line>::iterator Buffer::get_active_line()
+{
+    return lines.begin() + cursor;
+}
+
+std::pair<std::vector<Buffer::Line>::iterator, std::vector<Buffer::Line>::iterator> Buffer::get_render_zone(int nlines)
+{
+    return std::pair<std::vector<Line>::iterator, std::vector<Line>::iterator>();
+}
+
+void Buffer::right()
+{
+    if (this->get_cursor_row() < lines[cursor].buffer.size())
+    {
+        lines[cursor].cursor++;
+    }
+}
+
 Buffer Buffer::read(const char *filename)
 {
     std::vector<std::string> lines;
@@ -77,7 +127,8 @@ Buffer Buffer::read(const char *filename)
     {
         b.lines[i].buffer = std::move(lines[i]);
     }
-    if (b.lines.size() == 0){
+    if (b.lines.size() == 0)
+    {
         b.lines.emplace_back();
     }
     return b;
@@ -87,10 +138,10 @@ bool Buffer::write(const char *filename)
 {
     std::ofstream of(filename);
 
-    for (const auto& line : this->lines)
+    for (const auto &line : this->lines)
     {
         of << line.buffer << std::endl;
-    }    
+    }
 
     return true;
 }
