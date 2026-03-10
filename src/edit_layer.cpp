@@ -39,17 +39,27 @@ void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
 
     render_filename(renderer, w, h, file_saved);
 
+    auto lines = context.get_render_zone((h - this->status_height) / line_height);
+    auto sel_line = context.get_active_line();
     size_t nloops{0};
-    for (size_t i = context.cursor; i < context.lines.size(); (i++, nloops++))
+    for (auto it = lines.first; it != lines.second; (it++, nloops++))
     {
-        if (!context.lines[i].buffer.empty())
+        if (it->buffer.size() > 0)
         {
-            RasterizedTextInfo line(font, renderer, context.lines[i].buffer.c_str(), text_color);
-            line.render(renderer, 0, status_height + (nloops * line_height));
+
+            if (it == sel_line)
+            {
+                this->render_active_line(*it, renderer, w, h, 0, status_height + (nloops * line_height));
+            }
+            else
+            {
+                RasterizedTextInfo line(font, renderer, it->buffer.c_str(), text_color);
+                line.render(renderer, 0, status_height + (nloops * line_height));
+            }
         }
     }
 
-    render_cursor(renderer, w, h);
+    // render_cursor(renderer, w, h);
 }
 
 bool EditLayer::handle_update(const SDL_Event &evt)
@@ -258,4 +268,11 @@ void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h)
     rect.w = 3;
     rect.h = height;
     LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &rect));
+}
+
+void EditLayer::render_active_line(const Buffer::Line &ln, SDL_Renderer *renderer, int w, int h, int x, int y)
+{
+    // TODO
+    // TTF_MeasureUTF8();
+    auto it = ln.buffer.begin() + ln.cursor;
 }

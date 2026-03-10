@@ -100,8 +100,33 @@ std::vector<Buffer::Line>::iterator Buffer::get_active_line()
 
 std::pair<std::vector<Buffer::Line>::iterator, std::vector<Buffer::Line>::iterator> Buffer::get_render_zone(int nlines)
 {
-    // TODO
-    return std::pair<std::vector<Line>::iterator, std::vector<Line>::iterator>();
+    if (nlines <= 0)
+    {
+        return std::make_pair(lines.end(), lines.end());
+    }
+
+    if (nlines >= lines.size())
+    {
+        nlines = lines.size();
+    }
+    auto begin = get_active_line();
+    auto end = get_active_line();
+    auto count{0};
+    while (count < nlines)
+    {
+        if (count < nlines && end != lines.end())
+        {
+            end++;
+            count++;
+        }
+        if (count < nlines && begin != lines.begin())
+        {
+            begin--;
+            count++;
+        }
+    }
+
+    return std::make_pair(begin, end);
 }
 
 void Buffer::right()
