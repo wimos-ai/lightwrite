@@ -250,13 +250,13 @@ void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, bool file_
     inf.render(renderer, 0, 0);
 }
 
-void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h)
+void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h, const std::string &bf_str, size_t cursor)
 {
 
     int width;  // used for font-width
     int height; // used for font-height
 
-    auto str = context.get().buffer.substr(0, context.get().cursor);
+    auto str = bf_str.substr(0, cursor);
 
     LOG_TTF_ERROR(TTF_SizeUTF8(font, str.c_str(), &width, &height));
 
@@ -270,9 +270,45 @@ void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h)
     LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &rect));
 }
 
+std::pair<std::string_view, size_t> EditLayer::get_active_ln_info(const Buffer::Line &ln, int w, TTF_Font *font)
+{
+    int extent{0};
+    int count{0};
+    LOG_TTF_ERROR(TTF_MeasureUTF8(font, ln.buffer.c_str(), w, &extent, &count));
+    if (count > ln.buffer.size())
+    {
+        count = ln.buffer.size();
+    }
+
+    size_t n_chars{0};
+    size_t before{0};
+    auto begin = ln.buffer.begin() + ln.cursor;
+    auto end = ln.buffer.begin() + ln.cursor;
+
+    while (n_chars < count)
+    {
+        if (begin != ln.buffer.begin())
+        {
+            begin--;
+            n_chars++;
+            before++;
+        }
+        if (end != ln.buffer.end())
+        {
+            end++;
+            n_chars++;
+        }
+    }
+    return std::make_pair(std::string_view{begin, end}, before);
+}
+
 void EditLayer::render_active_line(const Buffer::Line &ln, SDL_Renderer *renderer, int w, int h, int x, int y)
 {
-    // TODO
-    // TTF_MeasureUTF8();
-    auto it = ln.buffer.begin() + ln.cursor;
+    auto [substr, new_cursor] = EditLayer::get_active_ln_info(ln, w, font);
+
+    std::string str{substr};
+
+    RasterizedTextInfo line(font, renderer, str.c_str(), text_color);
+    line.render(renderer, x, y);
+    render_cursor(renderer, w, h, str, new_cursor);
 }
