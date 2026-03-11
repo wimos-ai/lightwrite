@@ -250,7 +250,7 @@ void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, bool file_
     inf.render(renderer, 0, 0);
 }
 
-void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h, const std::string &bf_str, size_t cursor)
+void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h, int y, const std::string &bf_str, size_t cursor)
 {
 
     int width;  // used for font-width
@@ -264,7 +264,7 @@ void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h, const std::s
     LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255));
     SDL_Rect rect;
     rect.x = width;
-    rect.y = status_height;
+    rect.y = y;
     rect.w = 3;
     rect.h = height;
     LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &rect));
@@ -310,5 +310,5 @@ void EditLayer::render_active_line(const Buffer::Line &ln, SDL_Renderer *rendere
 
     RasterizedTextInfo line(font, renderer, str.c_str(), text_color);
     line.render(renderer, x, y);
-    render_cursor(renderer, w, h, str, new_cursor);
+    render_cursor(renderer, w, h, y,str, new_cursor);
 }

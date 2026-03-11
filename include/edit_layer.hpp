@@ -32,7 +32,7 @@ public:
 
 private:
     void render_filename(SDL_Renderer *renderer, int w, int h, bool file_saved);
-    void render_cursor(SDL_Renderer *renderer, int w, int h, const std::string& bf_str, size_t cursor);
+    void render_cursor(SDL_Renderer *renderer, int w, int h,int y, const std::string& bf_str, size_t cursor);
     void render_active_line(const Buffer::Line &ln, SDL_Renderer *renderer, int w, int h, int x, int y);
 
     void save_buffer();
