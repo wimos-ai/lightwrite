@@ -12,6 +12,7 @@ include(CTest)  # Enables testing
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 # Fetch GoogleTest automatically
 include(FetchContent)
@@ -70,7 +71,7 @@ target_compile_definitions(MyProjectLib PUBLIC
 # add_compile_options(-ffile-prefix-map=${PROJECT_ROOT_NORMALIZED}=)
 
 add_executable(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/main.cpp)  # adjust if needed
-target_link_libraries(${PROJECT_NAME} PRIVATE MyProjectLib)
+target_link_libraries(${PROJECT_NAME} PRIVATE MyProjectLib OpenSSL::SSL OpenSSL::Crypto)
 
 # -------------------------
 # Tests
