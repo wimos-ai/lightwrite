@@ -1,15 +1,6 @@
 #include "utilities.hpp"
 #include "logger.hpp"
 
-int line_height(TTF_Font *font)
-{
-    const char *testLine = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
-    int h;
-    int w;
-    LOG_TTF_ERROR(TTF_SizeText(font, testLine, &w, &h));
-    return h;
-}
-
 SDL_Color get_color_negitive(SDL_Color other)
 {
     return SDL_Color{255 - other.r, 255 - other.g, 255 - other.b, other.a};

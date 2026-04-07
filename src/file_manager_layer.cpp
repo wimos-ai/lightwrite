@@ -13,9 +13,9 @@ FileManagerLayer::FileManagerLayer(const std::filesystem::path &directory_, cons
                                                                                                                                                         title_font(TTF_OpenFont(title_font, title_sz)),
                                                                                                                                                         text_font(TTF_OpenFont(text_font, text_sz)),
                                                                                                                                                         title(std::string("Directory: ") + dir.c_str()),
-                                                                                                                                                        title_height(line_height(this->title_font)),
+                                                                                                                                                        title_height(TTF_FontHeight(this->title_font)),
                                                                                                                                                         files(files_from_dir(dir)),
-                                                                                                                                                        text_height(line_height(this->text_font))
+                                                                                                                                                        text_height(TTF_FontHeight(this->text_font))
 {
     if (!title_font)
     {

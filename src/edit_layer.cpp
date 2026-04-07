@@ -9,8 +9,8 @@
 EditLayer::EditLayer(const char *font_path_, int font_sz) : font_path(font_path_),
                                                             base_ft_size(font_sz),
                                                             font(TTF_OpenFont(font_path, base_ft_size * ft_scale)),
-                                                            status_height(::line_height(this->font) + 2),
-                                                            line_height(::line_height(this->font)),
+                                                            status_height(TTF_FontHeight(this->font) + 2),
+                                                            line_height(TTF_FontHeight(this->font)),
                                                             file_saved(false)
 {
     if (!font)
@@ -38,8 +38,8 @@ void EditLayer::init_fonts()
 {
     TTF_CloseFont(font);
     font = TTF_OpenFont(font_path, base_ft_size * ft_scale);
-    this->status_height = ::line_height(this->font) + 2;
-    this->line_height = ::line_height(this->font);
+    this->status_height = TTF_FontHeight(this->font) + 2;
+    this->line_height = TTF_FontHeight(this->font);
 }
 
 void EditLayer::inc_scaling()

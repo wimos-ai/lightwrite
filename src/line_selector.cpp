@@ -6,8 +6,8 @@
 
 LineSelector::LineSelector(const char *title_font, int title_sz, const char *text_font, int text_sz, const char *title) : title_font(TTF_OpenFont(title_font, title_sz)),
                                                                                                                           text_font(TTF_OpenFont(text_font, text_sz)),
-                                                                                                                          title_height(line_height(this->title_font)),
-                                                                                                                          text_height(line_height(this->text_font)),
+                                                                                                                          title_height(TTF_FontHeight(this->title_font)),
+                                                                                                                          text_height(TTF_FontHeight(this->text_font)),
                                                                                                                           title(title)
 {
     if (!title_font)
