@@ -3,6 +3,25 @@
 #include <fstream>
 #include <algorithm>
 
+std::ostream &operator<<(std::ostream &os, const Buffer &b)
+{
+    os << "{\n";
+    os << "lines: " << '\n';
+    for (const auto &line : b.lines)
+    {
+        os << line << '\n';
+    }
+    os << "cursor: " << b.cursor;
+    os << "}\n";
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const Buffer::Line &a)
+{
+    os << "{buffer: [" << a.buffer << "] size: " << a.buffer.size() << " cursor: " << a.cursor << "}";
+    return os;
+}
+
 void Buffer::Line::ins_cursor(const char *text)
 {
     buffer = buffer.insert(cursor, text);

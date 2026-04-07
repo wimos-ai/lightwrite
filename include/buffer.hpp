@@ -30,6 +30,9 @@ public:
     public:
         std::string buffer;
         std::size_t cursor{0};
+
+    public:
+        friend std::ostream &operator<<(std::ostream &os, const Buffer::Line &a);
     };
 
 public:
@@ -70,7 +73,12 @@ public:
     static Buffer read(const char *filename);
     bool write(const char *filename);
 
-public:
+    friend std::ostream &operator<<(std::ostream &os, const Buffer &b);
+
+private:
     std::vector<Line> lines;
     std::size_t cursor{0};
 };
+
+std::ostream &operator<<(std::ostream &os, const Buffer &b);
+std::ostream &operator<<(std::ostream &os, const Buffer::Line &a);

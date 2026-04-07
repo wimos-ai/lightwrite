@@ -5,12 +5,6 @@
 
 #include <gtest/gtest.h>
 
-std::ostream &operator<<(std::ostream &os, const Buffer::Line &a)
-{
-    os << "{buffer: [" << a.buffer << "] size: " << a.buffer.size() << " cursor: " << a.cursor << "}";
-    return os;
-}
-
 TEST(ConvTest_LN, BasicConstruction)
 {
     const char *msg = "Hello";
@@ -101,25 +95,13 @@ TEST(ConvTest_LN, DEL)
     EXPECT_EQ("ello", line.buffer);
 }
 
-std::ostream &operator<<(std::ostream &os, const Buffer &b)
-{
-    os << "{\n";
-    os << "lines: " << '\n';
-    for (const auto &line : b.lines)
-    {
-        os << line << '\n';
-    }
-    os << "cursor: " << b.cursor;
-    os << "}\n";
-    return os;
-}
-
 TEST(ConvTest_Buffer, Buffer_push_ln)
 {
     Buffer ctxt2;
     ctxt2.push_line();
+    auto [a, b] = ctxt2.get_render_zone(1000);
 
-    EXPECT_EQ(ctxt2.lines.size(), 2);
+    EXPECT_EQ(std::distance(a, b), 2);
 }
 
 TEST(ConvTest_Buffer, Buffer_to_from_file)
@@ -132,10 +114,19 @@ TEST(ConvTest_Buffer, Buffer_to_from_file)
     b1.write(fname);
 
     Buffer b2{Buffer::read(fname)};
-    EXPECT_EQ(b1.lines.size(), b2.lines.size());
 
-    for (size_t i = 0; i < b1.lines.size(); i++)
+    auto nlines = [](Buffer &buff)
     {
-        EXPECT_EQ(b1.lines[i].buffer, b2.lines[i].buffer);
+        auto [a, b] = buff.get_render_zone(std::numeric_limits<int>::max());
+        return std::distance(a, b);
+    };
+
+    EXPECT_EQ(nlines(b1), nlines(b2));
+
+    for (size_t i = 0; i < nlines(b1); i++)
+    {
+        EXPECT_EQ(b1.get_active_line()->buffer, b2.get_active_line()->buffer);
+        b1.down();
+        b2.down();
     }
 }
