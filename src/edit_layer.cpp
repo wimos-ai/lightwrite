@@ -3,12 +3,15 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 #define FONT_PATH DATA_DIR "/MonoLisaRegular.ttf"
 
-EditLayer::EditLayer(const char *font_path, int font_sz) : font(TTF_OpenFont(font_path, font_sz)),
-                                                           status_height(::line_height(this->font) + 2),
-                                                           line_height(::line_height(this->font)),
-                                                           file_saved(false)
+EditLayer::EditLayer(const char *font_path_, int font_sz) : font_path(font_path_),
+                                                            base_ft_size(font_sz),
+                                                            font(TTF_OpenFont(font_path, base_ft_size * ft_scale)),
+                                                            status_height(::line_height(this->font) + 2),
+                                                            line_height(::line_height(this->font)),
+                                                            file_saved(false)
 {
     if (!font)
     {
@@ -29,6 +32,26 @@ EditLayer::EditLayer(const char *font_path, int font_sz, const char *fname) : Ed
 EditLayer::~EditLayer()
 {
     TTF_CloseFont(font);
+}
+
+void EditLayer::init_fonts()
+{
+    TTF_CloseFont(font);
+    font = TTF_OpenFont(font_path, base_ft_size * ft_scale);
+    this->status_height = ::line_height(this->font) + 2;
+    this->line_height = ::line_height(this->font);
+}
+
+void EditLayer::inc_scaling()
+{
+    this->ft_scale += 0.125;
+    init_fonts();
+}
+
+void EditLayer::dec_scaling()
+{
+    this->ft_scale -= 0.125;
+    init_fonts();
 }
 
 void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
@@ -146,6 +169,25 @@ bool EditLayer::handle_update(const SDL_Event &evt)
             file_saved = false;
         }
         break;
+
+        case SDLK_EQUALS:
+        {
+            if (keybinds_is_down(SDLK_LCTRL) && keybinds_is_down(SDLK_LSHIFT))
+            {
+                inc_scaling();
+                return true;
+            }
+        }
+        break;
+        case SDLK_MINUS:
+        {
+            if (keybinds_is_down(SDLK_LCTRL) && keybinds_is_down(SDLK_LSHIFT))
+            {
+                dec_scaling();
+                return true;
+            }
+        }
+        break;
         case SDLK_s:
         {
             // do not check for file*, buffer_write will create the class anyways.
@@ -186,6 +228,17 @@ bool EditLayer::handle_update(const SDL_Event &evt)
     break;
     case SDL_TEXTINPUT:
     {
+        // Ignore misc charecters when using the ctrl + shift + PLUS and ctrl + shift + - controls
+        if (keybinds_is_down(SDLK_LCTRL) && keybinds_is_down(SDLK_LSHIFT))
+        {
+            if (std::min(std::strlen(evt.text.text), sizeof(evt.text.text)) == 1)
+            {
+                if (evt.text.text[0] == '_' || evt.text.text[0] == '+')
+                {
+                    break;
+                }
+                        }
+        }
         context.ins_cursor(evt.text.text);
         file_saved = false;
     }
@@ -310,5 +363,5 @@ void EditLayer::render_active_line(const Buffer::Line &ln, SDL_Renderer *rendere
 
     RasterizedTextInfo line(font, renderer, str.c_str(), text_color);
     line.render(renderer, x, y);
-    render_cursor(renderer, w, h, y,str, new_cursor);
+    render_cursor(renderer, w, h, y, str, new_cursor);
 }

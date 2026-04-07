@@ -32,7 +32,7 @@ public:
 
 private:
     void render_filename(SDL_Renderer *renderer, int w, int h, bool file_saved);
-    void render_cursor(SDL_Renderer *renderer, int w, int h,int y, const std::string& bf_str, size_t cursor);
+    void render_cursor(SDL_Renderer *renderer, int w, int h, int y, const std::string &bf_str, size_t cursor);
     void render_active_line(const Buffer::Line &ln, SDL_Renderer *renderer, int w, int h, int x, int y);
 
     void save_buffer();
@@ -41,12 +41,24 @@ private:
     static std::pair<std::string_view, size_t> get_active_ln_info(const Buffer::Line &ln, int w, TTF_Font *font);
 
 private:
+    void init_fonts();
+    void inc_scaling();
+    void dec_scaling();
+
+private:
+    const char *font_path;
+    int base_ft_size;
+    float ft_scale = 1.0;
+
+private:
     TTF_Font *font;
+    int status_height;
+    int line_height;
+
+private:
     Buffer context;
     std::optional<std::filesystem::path> filename{std::nullopt};
     SDL_Color text_color = {255, 255, 255, 255};
-    const int status_height;
-    const int line_height;
     bool file_saved;
     std::optional<std::shared_ptr<AppLayer>> next_layer;
     std::optional<std::shared_ptr<FileManagerLayer>> fman;
