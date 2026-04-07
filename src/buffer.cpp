@@ -24,10 +24,9 @@ Buffer::Line::Line(const char *msg) : buffer(msg)
 
 void Buffer::Line::del()
 {
-    if (buffer.size() > 0)
+    if (buffer.size() > 0 && cursor <= buffer.size())
     {
-        buffer.erase(0, 1);
-        this->cursor--;
+        buffer.erase(this->cursor, 1);
     }
 }
 
