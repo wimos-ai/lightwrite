@@ -223,6 +223,16 @@ bool EditLayer::handle_update(const SDL_Event &evt)
             }
         }
         break;
+        case SDLK_HOME:
+        {
+            this->context.get_active_line()->cursor = 0;
+        }
+        break;
+        case SDLK_END:
+        {
+            this->context.get_active_line()->cursor = this->context.get_active_line()->buffer.size();
+        }
+        break;
         }
     }
     break;
@@ -237,7 +247,7 @@ bool EditLayer::handle_update(const SDL_Event &evt)
                 {
                     break;
                 }
-                        }
+            }
         }
         context.ins_cursor(evt.text.text);
         file_saved = false;
