@@ -56,6 +56,7 @@ target_include_directories(MyProjectLib PUBLIC
 target_link_libraries(MyProjectLib PUBLIC
     SDL2::SDL2
     SDL2_ttf::SDL2_ttf
+    OpenSSL::SSL OpenSSL::Crypto
 )
 
 target_compile_definitions(MyProjectLib PUBLIC
@@ -71,7 +72,7 @@ target_compile_definitions(MyProjectLib PUBLIC
 # add_compile_options(-ffile-prefix-map=${PROJECT_ROOT_NORMALIZED}=)
 
 add_executable(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/main.cpp)  # adjust if needed
-target_link_libraries(${PROJECT_NAME} PRIVATE MyProjectLib OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(${PROJECT_NAME} PRIVATE MyProjectLib)
 
 # -------------------------
 # Tests
