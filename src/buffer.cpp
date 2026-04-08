@@ -38,6 +38,26 @@ void Buffer::Line::del_cursor()
     }
 }
 
+size_t Buffer::Line::size() const
+{
+    return buffer.size();
+}
+
+Buffer::Line::operator std::string_view() const
+{
+    return buffer;
+}
+
+void Buffer::Line::reset_cursor()
+{
+    cursor = 0;
+}
+
+void Buffer::Line::end_cursor()
+{
+    cursor = buffer.size();
+}
+
 Buffer::Line::Line(const char *msg) : buffer(msg)
 {
 }

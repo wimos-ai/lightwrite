@@ -29,9 +29,18 @@ public:
 
         std::pair<std::string_view, std::string_view::iterator> get_render_window(int num_chars) const;
 
-    public:
+        size_t size() const;
+
+        operator std::string_view() const;
+
+        void reset_cursor();
+
+        void end_cursor();
+
+    private:
         std::string buffer;
         std::size_t cursor{0};
+        friend class Buffer;
 
     public:
         friend std::ostream &operator<<(std::ostream &os, const Buffer::Line &a);

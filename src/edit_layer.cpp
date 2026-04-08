@@ -67,7 +67,7 @@ void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
     size_t nloops{0};
     for (auto it = lines.first; it != lines.second; (it++, nloops++))
     {
-        if (it->buffer.size() > 0)
+        if (it->size() > 0)
         {
 
             if (it == sel_line)
@@ -76,7 +76,7 @@ void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
             }
             else
             {
-                RasterizedTextInfo line(font, renderer, it->buffer, text_color);
+                RasterizedTextInfo line(font, renderer, *it, text_color);
                 line.render(renderer, 0, status_height + (nloops * line_height));
             }
         }
@@ -223,12 +223,12 @@ bool EditLayer::handle_update(const SDL_Event &evt)
         break;
         case SDLK_HOME:
         {
-            this->context.get_active_line()->cursor = 0;
+            this->context.get_active_line()->reset_cursor();
         }
         break;
         case SDLK_END:
         {
-            this->context.get_active_line()->cursor = this->context.get_active_line()->buffer.size();
+            this->context.get_active_line()->end_cursor();
         }
         break;
         }
@@ -335,7 +335,7 @@ void EditLayer::render_active_line(const Buffer::Line &ln, SDL_Renderer *rendere
 {
     int extent{0};
     int count{0};
-    LOG_TTF_ERROR(TTF_MeasureUTF8(font, ln.buffer.c_str(), w, &extent, &count));
+    LOG_TTF_ERROR(TTF_MeasureUTF8(font,  RasterizedTextInfo::sv_fwd_helper(ln), w, &extent, &count));
 
     auto [substr, new_cursor] = ln.get_render_window(count);
 
