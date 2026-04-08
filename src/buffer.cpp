@@ -243,7 +243,7 @@ bool Buffer::write(const char *filename)
 
     for (const auto &line : this->lines)
     {
-        of << line.buffer << std::endl;
+        of << line.buffer << '\n';
     }
 
     return true;
