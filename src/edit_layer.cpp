@@ -24,7 +24,7 @@ EditLayer::EditLayer(const char *font_path, int font_sz, const char *fname) : Ed
 {
     filename = fname;
 
-    this->context = Buffer::read(fname);
+    this->context = Buffer::read(filename.value());
 
     file_saved = true;
 }
@@ -104,7 +104,7 @@ bool EditLayer::handle_update(const SDL_Event &evt)
 
             try
             {
-                this->context = Buffer::read(fname.c_str());
+                this->context = Buffer::read(fname);
             }
             catch (const std::exception &e)
             {
@@ -265,10 +265,8 @@ void EditLayer::save_buffer()
 {
     if (filename.has_value())
     {
-        const char *fname = filename.value().c_str();
-
-        context.write(fname);
-        LOG_INFO("%s saved!", fname);
+        context.write(filename.value());
+        LOG_INFO("%s saved!", filename.value().c_str());
         file_saved = true;
     }
     else
@@ -335,7 +333,7 @@ void EditLayer::render_active_line(const Buffer::Line &ln, SDL_Renderer *rendere
 {
     int extent{0};
     int count{0};
-    LOG_TTF_ERROR(TTF_MeasureUTF8(font,  RasterizedTextInfo::sv_fwd_helper(ln), w, &extent, &count));
+    LOG_TTF_ERROR(TTF_MeasureUTF8(font, RasterizedTextInfo::sv_fwd_helper(ln), w, &extent, &count));
 
     auto [substr, new_cursor] = ln.get_render_window(count);
 

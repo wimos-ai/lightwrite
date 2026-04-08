@@ -214,11 +214,11 @@ void Buffer::right()
     }
 }
 
-Buffer Buffer::read(const char *filename)
+Buffer Buffer::read(const std::filesystem::path& fs)
 {
     std::vector<std::string> lines;
     std::string line;
-    std::ifstream fi(filename);
+    std::ifstream fi(fs);
     while (std::getline(fi, line))
     {
         lines.emplace_back(std::move(line));
@@ -237,9 +237,9 @@ Buffer Buffer::read(const char *filename)
     return b;
 }
 
-bool Buffer::write(const char *filename)
+bool Buffer::write(const std::filesystem::path& fs)
 {
-    std::ofstream of(filename);
+    std::ofstream of(fs);
 
     for (const auto &line : this->lines)
     {

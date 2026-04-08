@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 
 class Buffer
 {
@@ -81,8 +82,8 @@ public:
     std::pair<std::vector<Line>::iterator, std::vector<Line>::iterator> get_render_zone(int nlines);
 
 public:
-    static Buffer read(const char *filename);
-    bool write(const char *filename);
+    static Buffer read(const std::filesystem::path &fs);
+    bool write(const std::filesystem::path &fs);
 
     friend std::ostream &operator<<(std::ostream &os, const Buffer &b);
 
