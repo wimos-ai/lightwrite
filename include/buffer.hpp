@@ -27,6 +27,8 @@ public:
         void del_cursor();
         void del();
 
+        std::pair<std::string_view, std::string_view::iterator> get_render_window(int num_chars) const;
+
     public:
         std::string buffer;
         std::size_t cursor{0};

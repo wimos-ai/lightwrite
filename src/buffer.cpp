@@ -2,6 +2,7 @@
 #include <cstring>
 #include <fstream>
 #include <algorithm>
+#include <iterator>
 
 std::ostream &operator<<(std::ostream &os, const Buffer &b)
 {
@@ -47,6 +48,44 @@ void Buffer::Line::del()
     {
         buffer.erase(this->cursor, 1);
     }
+}
+
+std::pair<std::string_view, std::string_view::iterator> Buffer::Line::get_render_window(int num_chars) const
+{
+    if (buffer.size() == 0)
+    {
+        std::string_view sv;
+        return {sv, sv.end()};
+    }
+
+    if (num_chars > buffer.size())
+    {
+        std::string_view sv{buffer};
+        return {sv, sv.begin() + cursor};
+    }
+
+    auto cursor_itr = this->buffer.begin() + this->cursor;
+    auto begin = cursor_itr;
+    auto end = cursor_itr;
+
+    auto count{0};
+    while (count < num_chars)
+    {
+        if (count < num_chars && end != buffer.end())
+        {
+            end++;
+            count++;
+        }
+        if (count < num_chars && begin != buffer.begin())
+        {
+            begin--;
+            count++;
+        }
+    }
+
+    std::string_view sv{begin, end};
+    auto d_c = std::distance(begin, cursor_itr);
+    return {sv, sv.begin() + d_c};
 }
 
 Buffer::Buffer()
