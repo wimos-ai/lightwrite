@@ -4,12 +4,18 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-#include "line_selector.hpp"
+#include <memory>
+
+namespace pfd
+{
+    class save_file;
+}
 
 class FileManagerLayer : public ResourceSelectionLayer<std::filesystem::path>
 {
+private:
 public:
-    FileManagerLayer(const std::filesystem::path& dir, const char *title_font, int title_sz, const char *text_font, int text_sz);
+    FileManagerLayer(const std::filesystem::path &dir);
 
     ~FileManagerLayer();
 
@@ -26,21 +32,5 @@ public:
     std::shared_ptr<AppLayer> next() override;
 
 private:
-    static std::vector<std::string> files_from_dir(std::filesystem::path& p);
-
-private:
-    std::filesystem::path dir;
-    TTF_Font *title_font{nullptr};
-    TTF_Font *text_font{nullptr};
-    std::string title;
-    int title_height;
-    int text_height;
-    std::vector<std::string> files;
-    size_t start_render_idx{0};
-    bool is_running{true};
-    std::optional<std::shared_ptr<LineSelector>> line_sel;
-
-    const SDL_Color title_color{255, 255, 255, 255};
-    const SDL_Color text_color{255, 255, 255, 255};
-    const SDL_Color bg_color{14, 14, 14, 255};
+    std::unique_ptr<pfd::save_file> file_save_as;
 };

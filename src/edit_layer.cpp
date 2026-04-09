@@ -202,14 +202,14 @@ bool EditLayer::handle_update(const SDL_Event &evt)
             {
                 if (filename.has_value())
                 {
-                    fman.emplace(std::make_shared<FileManagerLayer>(filename.value().parent_path(), FONT_PATH, 24, FONT_PATH, 16));
+                    fman.emplace(std::make_shared<FileManagerLayer>(filename.value().parent_path()));
                 }
                 else
                 {
                     try
                     {
                         auto cwd = std::filesystem::current_path();
-                        fman.emplace(std::make_shared<FileManagerLayer>(cwd, FONT_PATH, 24, FONT_PATH, 16));
+                        fman.emplace(std::make_shared<FileManagerLayer>(cwd));
                     }
                     catch (std::filesystem::filesystem_error &e)
                     {
