@@ -35,7 +35,7 @@ TEST(ENC_Test, BasicRoundTrip)
     std::string secret{"I am Carl the LLAMA!"};
     std::string enc_sec{"\0", secret.size()};
     std::string dec_sec{"\0", secret.size()};
-    std::array<unsigned char, 12> tag;
+    std::array<unsigned char, 16> tag;
 
     {
         auto rcode = gcm_encrypt((unsigned char *)secret.data(), secret.size(), nullptr, 0, key.data(), iv.data(), iv.size(), (unsigned char *)enc_sec.data(), tag.data());
@@ -63,7 +63,7 @@ TEST(ENC_Test, TagFailure)
     std::string secret{"I am Carl the LLAMA!"};
     std::string enc_sec{"\0", secret.size()};
     std::string dec_sec{"\0", secret.size()};
-    std::array<unsigned char, 12> tag;
+    std::array<unsigned char, 16> tag;
 
     {
         auto rcode = gcm_encrypt((unsigned char *)secret.data(), secret.size(), nullptr, 0, key.data(), iv.data(), iv.size(), (unsigned char *)enc_sec.data(), tag.data());
@@ -77,4 +77,27 @@ TEST(ENC_Test, TagFailure)
         auto rcode = gcm_decrypt((unsigned char *)enc_sec.data(), enc_sec.size(), nullptr, 0, tag.data(), key.data(), iv.data(), iv.size(), (unsigned char *)dec_sec.data());
         ASSERT_EQ(rcode, -1);
     }
+}
+
+TEST(ENC_Test, ImprovedAPI)
+{
+    auto s1 = rand_salt();
+
+    auto key = derive_key("Hello", s1, 1);
+
+    auto iv = rand_iv();
+
+    auto sec = "I like trains (Everyone knows)";
+
+    auto ev = gcm_encrypt(sec, {}, key, iv);
+
+    ASSERT_TRUE(ev.has_value());
+
+    LOG_INFO("HELLO");
+
+    auto dv = gcm_decrypt(ev.value().first, {}, ev.value().second, key, iv);
+
+    ASSERT_TRUE(dv.has_value());
+
+    ASSERT_EQ(std::string_view(sec), std::string_view(dv.value()));
 }

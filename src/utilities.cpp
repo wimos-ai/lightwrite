@@ -275,7 +275,7 @@ std::array<unsigned char, 12> rand_iv()
     return arr;
 }
 
-std::array<unsigned char, 32> derive_key(std::string_view password, std::array<unsigned char, 16> &salt, int iterations )
+std::array<unsigned char, 32> derive_key(std::string_view password, std::array<unsigned char, 16> &salt, int iterations)
 {
 
     std::array<unsigned char, 32> key;
