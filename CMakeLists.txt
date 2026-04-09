@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
+cmake_policy(SET CMP0135 NEW)
+
 project(Nitewrite)
 
 set(CMAKE_CXX_STANDARD 20)

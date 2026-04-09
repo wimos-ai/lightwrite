@@ -13,7 +13,11 @@
 
 SDL_Color get_color_negitive(SDL_Color other)
 {
-    return SDL_Color{255 - other.r, 255 - other.g, 255 - other.b, other.a};
+    return SDL_Color{
+        static_cast<Uint8>(255 - other.r),
+        static_cast<Uint8>(255 - other.g),
+        static_cast<Uint8>(255 - other.b),
+        other.a};
 }
 
 RasterizedTextInfo::RasterizedTextInfo(TTF_Font *font, SDL_Renderer *renderer, const char *text, SDL_Color color)
@@ -255,7 +259,6 @@ namespace enc
             return -1;
         }
     }
-
 
     salt_t rand_salt()
     {
