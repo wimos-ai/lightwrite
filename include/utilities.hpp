@@ -12,82 +12,91 @@
 
 #include "logger.hpp"
 
-int gcm_decrypt(unsigned char *ciphertext, int ciphertext_len,
-                unsigned char *aad, int aad_len,
-                unsigned char *tag,
-                unsigned char *key,
-                unsigned char *iv, int iv_len,
-                unsigned char *plaintext);
-
-int gcm_encrypt(unsigned char *plaintext, int plaintext_len,
-                unsigned char *aad, int aad_len,
-                unsigned char *key,
-                unsigned char *iv, int iv_len,
-                unsigned char *ciphertext,
-                unsigned char *tag);
-
-inline std::optional<std::pair<std::string, std::array<unsigned char, 16>>>
-gcm_encrypt(std::string_view plaintext,
-            std::string_view aad,
-            const std::array<unsigned char, 32> &key,
-            const std::array<unsigned char, 12> &iv)
+namespace enc
 {
-    std::string ciphertext;
-    ciphertext.resize(plaintext.size());
 
-    std::array<unsigned char, 16> tag{};
+    int gcm_decrypt(unsigned char *ciphertext, int ciphertext_len,
+                    unsigned char *aad, int aad_len,
+                    unsigned char *tag,
+                    unsigned char *key,
+                    unsigned char *iv, int iv_len,
+                    unsigned char *plaintext);
 
-    int len = gcm_encrypt(
-        reinterpret_cast<unsigned char *>(const_cast<char *>(plaintext.data())),
-        static_cast<int>(plaintext.size()),
-        reinterpret_cast<unsigned char *>(const_cast<char *>(aad.data())),
-        static_cast<int>(aad.size()),
-        const_cast<unsigned char *>(key.data()),
-        const_cast<unsigned char *>(iv.data()),
-        static_cast<int>(iv.size()),
-        reinterpret_cast<unsigned char *>(ciphertext.data()),
-        tag.data());
+    int gcm_encrypt(unsigned char *plaintext, int plaintext_len,
+                    unsigned char *aad, int aad_len,
+                    unsigned char *key,
+                    unsigned char *iv, int iv_len,
+                    unsigned char *ciphertext,
+                    unsigned char *tag);
 
-    if (len < 0)
-        return std::nullopt;
+    using salt_t = std::array<unsigned char, 16>;
+    using tag_t = std::array<unsigned char, 16>;
+    using iv_t = std::array<unsigned char, 12>;
+    using key_t = std::array<unsigned char, 32>;
 
-    ciphertext.resize(len);
-    return std::make_optional(std::make_pair(std::move(ciphertext), tag));
-}
+    inline std::optional<std::pair<std::string, tag_t>>
+    gcm_encrypt(std::string_view plaintext,
+                std::string_view aad,
+                const key_t &key,
+                const iv_t &iv)
+    {
+        std::string ciphertext;
+        ciphertext.resize(plaintext.size());
 
-inline std::optional<std::string>
-gcm_decrypt(std::string_view ciphertext,
-            std::string_view aad,
-            const std::array<unsigned char, 16> &tag,
-            const std::array<unsigned char, 32> &key,
-            const std::array<unsigned char, 12> &iv)
-{
-    std::string plaintext;
-    plaintext.resize(ciphertext.size());
+        tag_t tag{};
 
-    int len = gcm_decrypt(
-        reinterpret_cast<unsigned char *>(const_cast<char *>(ciphertext.data())),
-        static_cast<int>(ciphertext.size()),
-        reinterpret_cast<unsigned char *>(const_cast<char *>(aad.data())),
-        static_cast<int>(aad.size()),
-        const_cast<unsigned char *>(tag.data()),
-        const_cast<unsigned char *>(key.data()),
-        const_cast<unsigned char *>(iv.data()),
-        static_cast<int>(iv.size()),
-        reinterpret_cast<unsigned char *>(plaintext.data()));
+        int len = gcm_encrypt(
+            reinterpret_cast<unsigned char *>(const_cast<char *>(plaintext.data())),
+            static_cast<int>(plaintext.size()),
+            reinterpret_cast<unsigned char *>(const_cast<char *>(aad.data())),
+            static_cast<int>(aad.size()),
+            const_cast<unsigned char *>(key.data()),
+            const_cast<unsigned char *>(iv.data()),
+            static_cast<int>(iv.size()),
+            reinterpret_cast<unsigned char *>(ciphertext.data()),
+            tag.data());
 
-    if (len < 0)
-        return std::nullopt;
+        if (len < 0)
+            return std::nullopt;
 
-    plaintext.resize(len);
-    return std::make_optional(std::move(plaintext));
-}
+        ciphertext.resize(len);
+        return std::make_optional(std::make_pair(std::move(ciphertext), tag));
+    }
 
-std::array<unsigned char, 32> derive_key(std::string_view password, std::array<unsigned char, 16> &salt, int iterations = 100000);
+    inline std::optional<std::string>
+    gcm_decrypt(std::string_view ciphertext,
+                std::string_view aad,
+                const tag_t &tag,
+                const key_t &key,
+                const iv_t &iv)
+    {
+        std::string plaintext;
+        plaintext.resize(ciphertext.size());
 
-std::array<unsigned char, 16> rand_salt();
+        int len = gcm_decrypt(
+            reinterpret_cast<unsigned char *>(const_cast<char *>(ciphertext.data())),
+            static_cast<int>(ciphertext.size()),
+            reinterpret_cast<unsigned char *>(const_cast<char *>(aad.data())),
+            static_cast<int>(aad.size()),
+            const_cast<unsigned char *>(tag.data()),
+            const_cast<unsigned char *>(key.data()),
+            const_cast<unsigned char *>(iv.data()),
+            static_cast<int>(iv.size()),
+            reinterpret_cast<unsigned char *>(plaintext.data()));
 
-std::array<unsigned char, 12> rand_iv();
+        if (len < 0)
+            return std::nullopt;
+
+        plaintext.resize(len);
+        return std::make_optional(std::move(plaintext));
+    }
+
+    key_t derive_key(std::string_view password, const salt_t &salt, int iterations = 100000);
+
+    salt_t rand_salt();
+
+    iv_t rand_iv();
+};
 
 SDL_Color get_color_negitive(SDL_Color other);
 
