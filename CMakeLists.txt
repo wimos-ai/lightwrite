@@ -53,6 +53,7 @@ add_library(MyProjectLib ${SOURCES})
 
 target_include_directories(MyProjectLib PUBLIC
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/libs
 )
 
 target_link_libraries(MyProjectLib PUBLIC
