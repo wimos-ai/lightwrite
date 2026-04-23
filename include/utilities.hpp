@@ -100,6 +100,10 @@ namespace enc
 
 SDL_Color get_color_negitive(SDL_Color other);
 
+TTF_Font* get_default_font(int font_sz);
+
+TTF_Font* font_from_buffer(const char* buff, size_t bufflen, int font_sz);
+
 class RasterizedTextInfo
 {
 public:

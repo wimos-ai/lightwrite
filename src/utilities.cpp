@@ -11,6 +11,8 @@
 #include <openssl/pem.h>
 #include <openssl/evp.h>
 
+#include "MonoLisaRegular.h"
+
 SDL_Color get_color_negitive(SDL_Color other)
 {
     return SDL_Color{
@@ -18,6 +20,26 @@ SDL_Color get_color_negitive(SDL_Color other)
         static_cast<Uint8>(255 - other.g),
         static_cast<Uint8>(255 - other.b),
         other.a};
+}
+
+TTF_Font *get_default_font(int font_sz)
+{
+    return font_from_buffer(bin2cpp::getMonoLisaRegularTtfFile().getBuffer(),
+                            bin2cpp::getMonoLisaRegularTtfFile().getSize(),
+                            font_sz);
+}
+
+TTF_Font *font_from_buffer(const char *buff, size_t bufflen, int font_sz)
+{
+    // buffer is your char* containing raw font file data
+    SDL_RWops *rw = SDL_RWFromConstMem(buff, bufflen);
+    TTF_Font *font = TTF_OpenFontRW(rw, 1, font_sz); // '1' tells SDL to free the RWops for you
+    if (!font)
+    {
+        LOG_ERROR("TTF_OpenFontRW: %s", TTF_GetError());
+    }
+
+    return font;
 }
 
 RasterizedTextInfo::RasterizedTextInfo(TTF_Font *font, SDL_Renderer *renderer, const char *text, SDL_Color color)

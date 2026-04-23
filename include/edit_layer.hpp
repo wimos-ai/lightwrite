@@ -14,8 +14,8 @@
 class EditLayer : public AppLayer
 {
 public:
-    EditLayer(const char *font_path, int font_sz);
-    EditLayer(const char *font_path, int font_sz, const char *fname);
+    EditLayer(int font_sz);
+    EditLayer(int font_sz, const char *fname);
     ~EditLayer();
 
 public:
@@ -43,7 +43,6 @@ private:
     void dec_scaling();
 
 private:
-    const char *font_path;
     int base_ft_size;
     float ft_scale = 1.0;
 

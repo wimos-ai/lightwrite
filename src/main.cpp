@@ -26,7 +26,7 @@ int main(int argc, const char *const *argv)
     }
 
     {
-        auto ptr = argc == 2 ? std::make_shared<EditLayer>(FONT_PATH, 16, argv[1]) : std::make_shared<EditLayer>(FONT_PATH, 16);
+        auto ptr = argc == 2 ? std::make_shared<EditLayer>(16, argv[1]) : std::make_shared<EditLayer>(16);
         AppContainer ctnr(ptr, "lightbrite", 800, 600);
         ctnr.run();
     }

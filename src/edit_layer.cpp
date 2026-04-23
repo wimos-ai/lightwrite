@@ -4,23 +4,20 @@
 #include <iostream>
 #include <algorithm>
 #include <cstring>
-#define FONT_PATH DATA_DIR "/MonoLisaRegular.ttf"
 
-EditLayer::EditLayer(const char *font_path_, int font_sz) : font_path(font_path_),
-                                                            base_ft_size(font_sz),
-                                                            font(TTF_OpenFont(font_path, base_ft_size * ft_scale)),
-                                                            status_height(TTF_FontHeight(this->font) + 2),
-                                                            line_height(TTF_FontHeight(this->font)),
-                                                            file_saved(false)
+EditLayer::EditLayer(int font_sz) : base_ft_size(font_sz),
+                                    font(get_default_font(font_sz)),
+                                    status_height(TTF_FontHeight(this->font) + 2),
+                                    line_height(TTF_FontHeight(this->font)),
+                                    file_saved(false)
 {
     if (!font)
     {
-        LOG_FATAL("TTF_OpenFont-Error: %s", TTF_GetError());
-        throw std::runtime_error("TTF_OpenFont");
+        throw std::runtime_error("get_default_font");
     }
 }
 
-EditLayer::EditLayer(const char *font_path, int font_sz, const char *fname) : EditLayer(font_path, font_sz)
+EditLayer::EditLayer(int font_sz, const char *fname) : EditLayer(font_sz)
 {
     filename = fname;
 
@@ -37,7 +34,7 @@ EditLayer::~EditLayer()
 void EditLayer::init_fonts()
 {
     TTF_CloseFont(font);
-    font = TTF_OpenFont(font_path, base_ft_size * ft_scale);
+    font = get_default_font(base_ft_size * ft_scale);
     this->status_height = TTF_FontHeight(this->font) + 2;
     this->line_height = TTF_FontHeight(this->font);
 }
