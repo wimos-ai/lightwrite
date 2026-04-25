@@ -5,4 +5,3 @@
 4. Make buffer allocator aware
 5. Make buffer use securely allocated strings
 6. Add encryption-file method
-7. Fix the hard coded MonoLisaRegular font
