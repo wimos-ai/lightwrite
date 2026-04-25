@@ -100,9 +100,12 @@ namespace enc
 
 SDL_Color get_color_negitive(SDL_Color other);
 
-TTF_Font* get_default_font(int font_sz);
+TTF_Font *get_default_font(int font_sz);
 
-TTF_Font* font_from_buffer(const char* buff, size_t bufflen, int font_sz);
+TTF_Font *font_from_buffer(const char *buff, size_t bufflen, int font_sz);
+
+// Returns the widest string and its rendered width
+std::pair<const char *, int> get_widest_str(TTF_Font *font, std::span<const char *> strs);
 
 class RasterizedTextInfo
 {

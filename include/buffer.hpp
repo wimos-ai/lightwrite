@@ -78,6 +78,16 @@ public:
     void scroll(int nlines);
 
 public:
+    size_t get_line_number(const std::vector<Line>::iterator &line)
+    {
+        return std::distance(lines.begin(), line) + 1;
+    }
+
+    size_t get_n_lines() const
+    {
+        return lines.size();
+    }
+
     std::vector<Line>::iterator get_active_line();
     std::pair<std::vector<Line>::iterator, std::vector<Line>::iterator> get_render_zone(int nlines);
 

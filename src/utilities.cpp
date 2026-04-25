@@ -1,6 +1,8 @@
 #include "utilities.hpp"
 #include "logger.hpp"
 
+#include <ranges>
+#include <algorithm>
 #include <array>
 #include <cstring>
 
@@ -40,6 +42,19 @@ TTF_Font *font_from_buffer(const char *buff, size_t bufflen, int font_sz)
     }
 
     return font;
+}
+
+std::pair<const char *, int> get_widest_str(TTF_Font *font, std::span<const char *> strs)
+{
+    auto proj = [font](const auto &a)
+    {
+        int w;
+        int h;
+        LOG_TTF_ERROR(TTF_SizeUTF8(font, a, &w, &h));
+        return w;
+    };
+    auto idx = std::ranges::max_element(strs.begin(), strs.end(), {}, proj);
+    return std::make_pair(*idx, proj(*idx));
 }
 
 RasterizedTextInfo::RasterizedTextInfo(TTF_Font *font, SDL_Renderer *renderer, const char *text, SDL_Color color)

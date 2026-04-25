@@ -4,6 +4,9 @@
 #include <iostream>
 #include <algorithm>
 #include <cstring>
+#include <span>
+#include <array>
+#include <chrono>
 
 EditLayer::EditLayer(int font_sz) : base_ft_size(font_sz),
                                     font(get_default_font(font_sz)),
@@ -61,21 +64,59 @@ void EditLayer::render(SDL_Window *window, SDL_Renderer *renderer, int w, int h)
 
     auto lines = context.get_render_zone((h - this->status_height) / line_height);
     auto sel_line = context.get_active_line();
-    size_t nloops{0};
-    for (auto it = lines.first; it != lines.second; (it++, nloops++))
+
+    // Determine Line Number width
+    auto [line_pad_w, lpad] = [this, lines]()
     {
-        if (it->size() > 0)
+        std::array<const char *, 9> char_strs = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
+        auto [widest_glyph, width] = get_widest_str(font, std::span(char_strs));
+        auto max_line_number = context.get_n_lines();
+        char buff[1024]; // You would need more than std::numeric_limits<std::size_t>::max() lines to excede this buffer
+        std::snprintf(buff, sizeof(buff) - 1, "%zu", max_line_number);
+        auto n_chars = std::strlen(buff);
+        for (size_t i = 0; i < n_chars; i++)
+        {
+            buff[i] = *widest_glyph;
+        }
+        int w;
+        int h;
+        LOG_TTF_ERROR(TTF_SizeUTF8(this->font, buff, &w, &h));
+        const double pad_percentage = 0.25;
+        int pad = std::ceil(w * pad_percentage);
+        return std::make_pair(w + pad + pad, pad);
+    }();
+
+    // Render Line Number Column Background
+    {
+        SDL_Rect lineNumberFillRect;
+        lineNumberFillRect.x = 0;
+        lineNumberFillRect.y = this->status_height;
+        lineNumberFillRect.w = line_pad_w;
+        lineNumberFillRect.h = h - this->status_height;
+        SDL_SetRenderDrawColor(renderer, 64, 64, 64, 255);
+        SDL_RenderFillRect(renderer, &lineNumberFillRect);
+    }
+
+    // Render Lines
+    {
+        size_t nloops{0};
+        for (auto it = lines.first; it != lines.second; (it++, nloops++))
         {
 
             if (it == sel_line)
             {
-                this->render_active_line(*it, renderer, w, h, 0, status_height + (nloops * line_height));
+                this->render_active_line(*it, renderer, w, h, line_pad_w, status_height + (nloops * line_height));
             }
             else
             {
-                RasterizedTextInfo line(font, renderer, *it, text_color);
-                line.render(renderer, 0, status_height + (nloops * line_height));
+                if (it->size() != 0)
+                {
+                    RasterizedTextInfo line(font, renderer, *it, text_color);
+                    line.render(renderer, line_pad_w, status_height + (nloops * line_height));
+                }
             }
+
+            render_line_number(renderer, context.get_line_number(it), lpad, status_height + (nloops * line_height));
         }
     }
 }
@@ -306,7 +347,15 @@ void EditLayer::render_filename(SDL_Renderer *renderer, int w, int h, bool file_
     inf.render(renderer, 0, 0);
 }
 
-void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h, int y, std::string_view sv, std::string_view::iterator cursor)
+void EditLayer::render_line_number(SDL_Renderer *renderer, size_t line_number, int x, int y)
+{
+    char buff[1024];
+    snprintf(buff, sizeof(buff), "%zu", line_number);
+    RasterizedTextInfo line(font, renderer, buff, text_color);
+    line.render(renderer, x, y);
+}
+
+void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h, int x, int y, std::string_view sv, std::string_view::iterator cursor)
 {
 
     int width;  // used for font-width
@@ -317,13 +366,19 @@ void EditLayer::render_cursor(SDL_Renderer *renderer, int w, int h, int y, std::
     LOG_TTF_ERROR(TTF_SizeUTF8(font, RasterizedTextInfo::sv_fwd_helper(str), &width, &height));
 
     // Render Cursor
-    LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255));
-    SDL_Rect rect;
-    rect.x = width;
-    rect.y = y;
-    rect.w = 3;
-    rect.h = height;
-    LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &rect));
+    using namespace std::chrono;
+    milliseconds ms = duration_cast<milliseconds>(
+        system_clock::now().time_since_epoch());
+    if (ms.count() % 1000 > 500) // Make Cursor blink 1/s
+    {
+        LOG_SDL_ERROR(SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255));
+        SDL_Rect rect;
+        rect.x = width + x;
+        rect.y = y;
+        rect.w = 3 * this->ft_scale;
+        rect.h = height;
+        LOG_SDL_ERROR(SDL_RenderFillRect(renderer, &rect));
+    }
 }
 
 void EditLayer::render_active_line(const Buffer::Line &ln, SDL_Renderer *renderer, int w, int h, int x, int y)
@@ -334,7 +389,11 @@ void EditLayer::render_active_line(const Buffer::Line &ln, SDL_Renderer *rendere
 
     auto [substr, new_cursor] = ln.get_render_window(count);
 
-    RasterizedTextInfo line(font, renderer, substr, text_color);
-    line.render(renderer, x, y);
-    render_cursor(renderer, w, h, y, substr, substr.begin() + std::distance(substr.begin(), new_cursor));
+    if (ln.size() > 0)
+    {
+        RasterizedTextInfo line(font, renderer, substr, text_color);
+        line.render(renderer, x, y);
+    }
+
+    render_cursor(renderer, w, h, x, y, substr, substr.begin() + std::distance(substr.begin(), new_cursor));
 }

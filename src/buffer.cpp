@@ -121,12 +121,30 @@ void Buffer::push_line()
 
 void Buffer::ins_cursor(const char *text)
 {
-    lines[cursor].ins_cursor(text);
+    if (lines.size() > 0)
+    {
+        lines[cursor].ins_cursor(text);
+    }else{
+        lines.emplace_back();
+        cursor = 0;
+        lines[cursor].ins_cursor(text);
+    }
 }
 
 void Buffer::del_cursor()
 {
-    lines[cursor].del_cursor();
+    if (lines.size() > 0)
+    {
+        if (lines[cursor].size() > 0)
+        {
+            lines[cursor].del_cursor();
+        }
+        else
+        {
+            lines.erase(lines.begin() + cursor);
+            cursor--;
+        }
+    }
 }
 
 void Buffer::del()
@@ -214,7 +232,7 @@ void Buffer::right()
     }
 }
 
-Buffer Buffer::read(const std::filesystem::path& fs)
+Buffer Buffer::read(const std::filesystem::path &fs)
 {
     std::vector<std::string> lines;
     std::string line;
@@ -237,7 +255,7 @@ Buffer Buffer::read(const std::filesystem::path& fs)
     return b;
 }
 
-bool Buffer::write(const std::filesystem::path& fs)
+bool Buffer::write(const std::filesystem::path &fs)
 {
     std::ofstream of(fs);
 
