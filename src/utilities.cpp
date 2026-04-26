@@ -12,6 +12,7 @@
 #include <openssl/err.h>
 #include <openssl/pem.h>
 #include <openssl/evp.h>
+#include <openssl/err.h>
 
 #include "MonoLisaRegular.h"
 
@@ -55,6 +56,17 @@ std::pair<const char *, int> get_widest_str(TTF_Font *font, std::span<const char
     };
     auto idx = std::ranges::max_element(strs.begin(), strs.end(), {}, proj);
     return std::make_pair(*idx, proj(*idx));
+}
+
+std::string getOpenSSLError()
+{
+    BIO *bio = BIO_new(BIO_s_mem());
+    ERR_print_errors(bio);
+    char *buf;
+    size_t len = BIO_get_mem_data(bio, &buf);
+    std::string ret(buf, len);
+    BIO_free(bio);
+    return ret;
 }
 
 RasterizedTextInfo::RasterizedTextInfo(TTF_Font *font, SDL_Renderer *renderer, const char *text, SDL_Color color)

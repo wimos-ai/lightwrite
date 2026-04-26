@@ -107,6 +107,8 @@ TTF_Font *font_from_buffer(const char *buff, size_t bufflen, int font_sz);
 // Returns the widest string and its rendered width
 std::pair<const char *, int> get_widest_str(TTF_Font *font, std::span<const char *> strs);
 
+std::string getOpenSSLError();
+
 class RasterizedTextInfo
 {
 public:
